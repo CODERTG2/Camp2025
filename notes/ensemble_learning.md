@@ -22,3 +22,7 @@ solves bias (error in testing data?) and variance (error in training data?)
 - a meta model would then combine the predictions from the diff types of models to make the final call
 - the predictions are the features for the meta model.
 - XGBoost or Logistic regression for the meta model
+
+---
+
+medical and law models need to be interoperable
