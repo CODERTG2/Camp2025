@@ -53,3 +53,8 @@ TF-IDF
 - weight = termfrequency * log(total num of docs/num of documents that have the word)
 - the log being the idf
 - the weight is used to alter the magnitude of the vectors while keeping the direction.
+
+## stuff
+Word2Vec
+- runs a binary prediction? 
+GloVe
