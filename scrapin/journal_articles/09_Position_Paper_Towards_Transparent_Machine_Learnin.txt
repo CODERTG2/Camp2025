@@ -1,0 +1,993 @@
+================================================================================
+JOURNAL ARTICLE #9
+================================================================================
+
+Title: Position Paper: Towards Transparent Machine Learning
+Authors: Dustin Juliano
+Published: 2019-11-12
+Source: http://arxiv.org/pdf/1911.06612v1
+
+--------------------------------------------------------------------------------
+ABSTRACT/SUMMARY:
+--------------------------------------------------------------------------------
+Transparent machine learning is introduced as an alternative form of machine
+learning, where both the model and the learning system are represented in
+source code form. The goal of this project is to enable direct human
+understanding of machine learning models, giving us the ability to learn,
+verify, and refine them as programs. If solved, this technology could represent
+a best-case scenario for the safety and security of AI systems going forward.
+
+--------------------------------------------------------------------------------
+FULL TEXT CONTENT:
+--------------------------------------------------------------------------------
+arXiv:1911.06612v1 [cs. LG] 12 Nov 2019Position Paper: Towards Transparent Machine
+Learning
+Dustin Juliano
+Nov. 1, 2019
+Abstract
+Transparent machine learning is introduced as an alternati ve form of
+machine learning, where both the model and the learning syst em are rep-
+resented in source code form. The goal of this project is to en able direct
+human understanding of machine learning models, giving us t he ability to
+learn, verify, and reﬁne them as programs. If solved, this te chnology could
+represent a best-case scenario for the safety and security o f AI systems
+going forward.
+1 Introduction
+Current machine learning (ML) systems produce models that a re diﬃcult or
+impossible to understand. This poses clear challenges with security, safety, and
+bias in these deployments. Opaque models also make it diﬃcul t to gain insight
+into the automated decision-making process. As a result of this, interpretable or explainable ML have bec ome active areas
+of research [ 1,2], with a notable interest from DARPA [ 3]. However, those
+approaches are focused on analyzing models that are inheren tly resistant to
+human understanding due to the way in which they are represen ted. Transparent machine learning (TML) is intended to solve the se problems by
+producing models and data that we can understand. It would do this by repre-
+senting and modifying source code representations. This, i n turn, would result
+in a potentially self-contained executable that could be de ployed directly. In addition to the source code model, the TML system itself ma y be embedded
+into the output program. This would give it the ability to con tinuously update
+itself. Embedding, however, is not a requirement; the learn er may be suppressed
+so that it is not emitted with the ﬁnal program. This could be f or safety purposes
+or to ensure stability of the deployment. A complex program may require auxiliary information, such a s labels, lookup
+tables, or a database of some kind. Transparent machine lear ning systems will
+need to produce such data to accurately represent the possib le programs in its
+search space. While the data can and should be made part of the source code
+1 model, large quantities of information should be stored ext ernally. This should
+be in a format that is appropriate to its size and intended usa ge. It it crucial that TML systems target commonly known program ming languages
+and data formats that can be easily understood. Further, the source code and
+data it produces in those languages and formats must be of suﬃcient clarity so
+that it can be easily understood and modiﬁed by an engineer of reasonable skill. This is a central tenant that should take priority over all ot her considerations,
+even at cost of model eﬃciency. Later on, suggestions will be given on how both
+eﬃciency and legibility might be accomplished, without per manently sacriﬁcing
+either.
+1.1 Long-Term Objectives
+The ultimate goal of TML is for it to target one or more depende ntly typed
+programming languages that feature support for rich speciﬁ cations. This would
+necessarily entail concepts from the work being done on Deep Speciﬁcation [ 4],
+which is an ambitious project1that seeks to formally verify the entire develop-
+ment pipeline, end-to-end, from application to OS, right do wn to the hardware. Then there are the long-term quality goals for the generated source code itself:
+• Dense commenting
+• Use of high-level abstractions
+• Minimization of complexity
+• Use of accelerated hardware
+• Multiple language targets
+Fully solving these goals may require complete or partial ge neral AI. This may
+put it into the classiﬁcation of being a potentially AI-comp lete or AI-hard prob-
+lem [ 5].
+1.2 Short-Term Objectives
+The immediate goals are to:
+1. Create a working transparent machine learning algorithm .
+2. Have that produce legible source code. The immediate challenge is just getting a working proof-of- concept. An early
+strategy would be to ﬁnd TML systems that equal or rival the be st ML. The
+rationale for this is that it would increase research intere st. Legibility, however,
+must eventually become the highest priority, otherwise it d efeats the purpose of
+the project; incomprehensible source code is just another t ype of opaque model.
+1See also: deepspec.org.
+2 2 Motivation
+One practical beneﬁt of TML is that we would unlock the capabi lity to produce
+explicit AI implementations. This could potentially help s olve one of the largest
+technical challenges of AI safety and security, known as the control problem [6]. Verifying that an opaque ML model adheres to its speciﬁcatio n is an impressive
+research eﬀort [ 7,8,9,10], but it is not equivalent to having human-readable
+source code. Transparent machine learning, in its most adva nced form, would
+not only give us an explicit program, but it would be “correct by construction” . This would be a result of it having been generated in programm ing languages
+with the most advanced type systems. By studying the source code produced by TML we could also gain knowledge
+about how it implemented its solution. Instead of creating s ystems that just give
+predictions, we could explore the space of programs that pro vide these models
+of intelligence. This could lead to unique insights into bot h the problem domain
+it is addressing and our understanding of artiﬁcial intelli gence itself. Transparent machine learning can be seen as a form of automat ed program-
+ming. This could greatly accelerate software and hardware d evelopment. And,
+because TML must understand source code in order to modify it , this gives it
+the potential to audit the software and hardware that we have created. It could
+be used to ﬁnd defects, improve eﬃciency, and even port proje cts to modern
+languages and platforms. Thus, it is not just something that will only help us
+going forward, but could be used to retroactively upgrade ex isting software. Having explicit AI implementations will help us understand how to build better
+automation. It may even help us ﬁnd new research directions t o pursue general
+AI. As will be discussed ahead, these two research direction s will eventually
+converge as the most signiﬁcant challenges of TML are addres sed.
+3 Challenges
+The greatest initial challenge for TML will be in making it as eﬀective and
+eﬃcient as current ML systems. It may be the case that computi ng TML
+models will require signiﬁcantly more resources. The autho r believes, however,
+that the resulting TML model, once found, will run signiﬁcan tly faster than
+traditional machine learning deployments. The rationale f or this prediction is
+that TML source models will be capable of being natively comp iled.
+3.1 The Labeling Problem
+After the initial proof-of-concept is realized there will b e another problem, and
+it will likely hold sway over TML until general AI is discover ed:the labeling
+problem . This is the challenge of how to create the most legible sourc e code. It is highly likely that the ﬁrst TML models will be incompreh ensible to us. An
+early example may end up looking something like the followin g:
+3 // Begin prototypes
+double _EB29F654701535CC(
+double _0,
+double _1,
+double _2,
+double _3);
+double _A141F416696C035A(
+double _0,
+double _1,
+double _2,
+double _3,
+double _4,
+double _5,
+double _6,
+double _7,
+double _8);
+double _D1773B8053A78241(
+double _0,
+double _1,
+double _2,
+double _4,
+double _5,
+double _6,
+double _7);
+That is clearly not a desirable ﬁnal outcome, but it would be a cceptable for an
+initial proof-of-concept. It is important to remember, however, that the labeling prob lem is not just
+about the naming of identiﬁers. It is also about the patterns that are used to
+realize the source code model. We need to move away from an abstract function space and into t he logic and
+conventions of computer programs. This means the use of algo rithms and data
+structures that are ubiquitous in software engineering. As computer programs are extremely ﬂexible with what they ca n entail, the
+challenge will be in conﬁning program search to patterns tha t we would be
+likely to use if we knew what the TML system knew about the data . The labeling problem also includes the issue of commenting. This implies that
+the concepts being used by the transparent learner will have to be represented
+in natural language. There really is no upper-bound on the complexity of comments , as this is equiv-
+alent to the TML system describing its “thoughts” or intent i n a way that may
+be missing from the source code itself. This capability puts this part of the
+labeling problem well into the range of problems only solvab le by general AI. It would be suﬃcient, however, that early comments were simp le enough to
+just help organize the structure of the source, and, perhaps , make references to
+particular features or subsets of training data.
+4 3.2 Program Search
+Program search is fundamentally hard. The space of programs is what TML
+must operate over, and to do so it must intelligently iterate over the well-formed
+statements of the language generated by some formal grammar . For detailed
+information on formal grammars and languages see [ 11,12,13]. How will search be conducted? Will it be directed or random? A combination of
+both? What is the measure of ﬁtness? What are the parameters o f the search? These are just some of the questions that will have to be answe red. Should one
+use algorithmic complexity [ 14,15], Shannon entropy [ 16], minimum message
+length [ 17,18,19], or some other method? An important early task for program search will likely be in r educing the search
+space itself. Opportunities may be found just by ensuring th e generated source
+code is syntactically and semantically correct for the targ et language. There is work related to this under the name of Universal Sear ch [20,21], which
+uses iterative search algorithms that seek solutions to inversion problems by
+exhaustively enumerating program descriptions for a unive rsal Turing machine. Informally, for a given function φand value y, an inversion problem is concerned
+with ﬁnding a value xsuch that φ(x) = y. More information on inversion
+problems can be found in [ 22] and [ 23].
+3.3 Program Generation
+Super-optimization [ 24,25,26,27,28,29,30] will be of interest to researchers
+undertaking transparent machine learning. This is because TML may need to
+make many millions of program permutations in order to appro ach meaningful
+solutions, and it will likely need to be able to do that extrem ely quickly to be
+practical. However, the problem is not merely one of speed. Reducing the number of
+times the learner has to iterate is of greater beneﬁt than red ucing the cost of
+generating the next permutation. While probably not realiz able in practice, a
+perfect TML system would only require a single iteration. Th is allows us to
+think of the number of iterations required to reach a solutio n as a kind of cost
+function. What is so interesting about super-optimization is that it h as already been
+demonstrated to be eﬀective. It proves a partial technical r esult towards fully
+realized TML without ever having been designed for this purp ose. The challenge
+is in scaling it up and utilizing it on the entire source model .
+3.4 Interfacing
+Most of the knowledge about the system calls and the various A PIs that are
+used in programming are expressed in disparate collections of natural language. Worse, they are often of uneven quality.
+5 How would the TML system know about these interfaces? It is no t suﬃcient
+for it to simply generate correct syntax for the target progr amming language. It must be able to entail the semantics of these programming i nterfaces. The only plausible answer seems to be that we would have to for mally specify
+the semantics and interdependencies between all of the APIs and system calls
+that the TML system could possibly rely upon. That is extremely non-trivial, as it implies the use of depen dently typed pro-
+gramming languages or speciﬁcation languages specially su ited to the task of
+interface-level interdependencies. Being dependently ty ped does not necessarily
+make a programming language suitable for productively writ ing complex speci-
+ﬁcations. There is early support being developed to entail c omplex state with
+dependent types in Idris [ 31], and it provides a clear case for just how diﬃ-
+cult it is to make dependent types as productive as conventio nal programming
+language constructs. Related to this challenge is the act of specifying a system so that it is internally
+consistent according to a certain design. This is diﬀerent f rom the above problem
+of entailing the state and interdependencies between calls to a programming
+interface. Both are a form of speciﬁcation, but the former ha s the challenge of
+having to interface with existing data and foreign function s. It can take teams of individuals to verify a complex system. O ne prominent
+example is Project Everest [ 32], which seeks to create a formally veriﬁed drop-
+in replacement for HTTPS. There have been others, such as Com pCert [ 33] and
+seL4 [ 34]. The purpose of canvasing these projects is to show how compli cated and costly
+it is to do formal veriﬁcation. The author strongly believes that the focus needs
+to be on making the tools easier to use. This would make veriﬁc ation more
+practical and open up the ﬁeld to a wider audience. Whether or not the details of specifying such complex rules a nd logic can be
+simpliﬁed is an open question. But it is one that must be inves tigated if we are
+to have ubiquitous, formally veriﬁed software and hardware . The problem of interfacing for TML is also complicated by the need to target
+multiple languages. Data formats are often used to communic ate complex in-
+formation between many of these systems, some of which are fa r more involved
+than just deﬁning a new data type. A good example of this chall enge would be
+in how TML would generate compute shaders and the relevant da ta to perform
+general-purpose GPU computation.
+3.5 Language Choice
+Should the target language be functional or imperative? Obj ect-oriented or
+procedural? These are important questions and there probab ly is no one right
+answer. However, there are two qualities that any TML target language should
+have: simplicity and eﬃciency. In terms of feature complexi ty and expressive-
+ness, less may be more when it comes to the choice of target lan guage.
+6 It could be useful to target a total programming language, th ough it need not
+be functional, as with [ 35]. While this would help ensure that every program
+terminates, it does not resolve the problem entirely. Consi der a program that
+calls the Ackermann function [ 36] with large positive integer values for each of
+its arguments. This would pass a termination check, but the r unning time of
+the program would have no practical end because of its asympt otic behavior. This ties in with a counter to one of the misnomers of using a to tal language,
+which is that one may believe that it can not entail long-runn ing processes,
+servers, simulations, or other such programs. The answer to this is that it is
+suﬃcient to have termination be contingent upon external in put, time, or a
+certain number of steps. These are all more or less admissibl e for a ﬂexible
+termination checking step. Like the above example, the ques tion of whether a
+program terminates is generally interpreted in a syntactic andstructural sense,
+and becomes a lot more involved when considering “external” eﬀects. Whatever paradigm is chosen, it is important to remember tha t legible source
+code is paramount. This does not equate with terseness. It is going to be a
+lot more helpful to have source code that some would consider to be verbose,
+especially in the early stages where the labeling problem re mains unsolved.
+3.6 Program Complexity
+Another major concern is how to reduce program complexity. W hile related
+to program search in the previous subsection, it has several distinctions. Eval-
+uation of ﬁtness during program search does not necessarily correspond with
+source code legibility. And that is what separates it so clea nly from the re-
+search into iterative or sequential program search. While a shorter program is
+preferable in many cases, that has to be reconciled with the r equirement for
+human understanding. There are several dimensions to program complexity, and eac h of them will be
+discussed. They are listed below by order of preference:
+1. The impact of program complexity on human understanding a nd program
+legibility.
+2. The relationship between program complexity and model eﬀ ectiveness,
+including ﬁtness and length of descriptions in an informati on theoretic
+interpretation.
+3. Program complexity in terms of runtime performance. The space of models is quite vast in machine learning, and it i s often the case
+that there are multiple models to choose from for a given set o f training data. The question of eﬀectiveness then has to be determined by a co mparison with
+the other competing priorities of complexity. And it should be noted that, apart
+from the ﬁrst rule of legibility, the other priorities shoul d be taken not as a rigid
+ordering, but as a set of guidelines; it is the speciﬁc use cas e of each TML model
+that must ultimately determine the ordering of these priori ties.
+7 3.6.1 Complexity and Legibility
+To maximize our understanding, we should ﬁrst think about ho w we develop
+high quality source code and then incorporate those ideas in to the TML algo-
+rithm. This could begin with an analysis of the structure of p rograms, which
+should include function, block, statement, and expression s each as independent
+levels of organization. The use of multiple ﬁles or “transla tion units” is also a
+major consideration, especially with regard to how it resol ves dependencies, both
+internally and externally, in the source model. A related qu estion is whether
+the system should involve the use of incremental compilatio n and linking. It
+may be simpler for early TML systems to just focus on standalo ne programs
+with a single translation unit. Will we allow the TML system to optimize its own style or shoul d it be re-
+stricted? Care must be taken with this, as any and all limitat ions on the ex-
+pression of programs by the TML system could signiﬁcantly im pact program
+search and model quality. This is especially diﬃcult becaus e of the competing
+priorities to reduce program complexity. It may require a lo t of experimentation. Worse yet is that these checks and balances may not be transfe rable between
+implementations; a set of priorities that works for one TML s ystem may not be
+beneﬁcial for another. Another aspect to program legibility is the question of whic h algorithms and
+data structures we allow it to use to construct its model. Con sider this as a set
+ofprogramming patterns . Do we open up the search space to include exploration
+of new patterns or should we provide this set based on standar d programming
+practice?
+3.6.2 Complexity and Model Fitness
+All things being equal, descriptive complexity should be mi nimized, but not at
+cost to legibility or runtime performance. Operating over source code presents challenges for the proc ess of model search
+if it performs that search in a representation that is diﬀere nt from the target
+languages of the TML model. While this additional layer of ab straction is
+temporarily admissible, it brings with it the additional re quirement that the
+mapping it uses is provably invertible. This is a consequence of ensuring TML
+is veriﬁable. It is tempting to think that the shortest program or subrouti ne is the best, but
+this will not always be the case. The target architecture in w hich the model
+will be deployed must be considered. Cache sizes, branch pre diction, memory
+constraints, and other factors play a role in the balance bet ween program com-
+plexity, size, and speed. How, though, do we even approach the issue of balancing model ﬁtness with the
+complexity of its description? And how can we ﬁnd or create an algorithm that
+does this while giving us the ability to understand what it pr oduces? One might begin by thinking that the TML algorithm must ﬁnd a m odel before
+it can explain it to us. But the way in which it constructs the m odel will
+8 necessarily curtail the space of models in which it conducts its search. And the
+optimization, measures, and metrics used during search may be antagonistic to
+the simplest and most easily understood programs. It has to k now, in advance,
+what we consider to be legibile, and that has to be used in tand em with any
+possible notion of ﬁtness for the model. They are inseparabl e. So, the process of model search and program generation must b e one in the
+same, or at least highly interdependent. One does not, and ca n not, come be-
+fore the other. This is why a purely reductive approach using data compression,
+information theory, and algorthmic complexity theory coul d be extremely mis-
+leading to a researcher who is trying to design a TML algorith m. Care must be
+taken to keep these measures in mind, but not to be bound to the m in a way
+that defeats their purpose.
+3.6.3 Complexity and Performance
+One simple example of a major runtime impact is the calling co nventions that are
+used in the target language. For example, the System V AMD64 A BI provides
+that the ﬁrst six arguments are passed in registers [ 37]. This places a premium on the complexity of the function signa tures themselves,
+tending towards six or less parameters on most consumer 64-b it hardware. On
+other target platforms, the calling conventions may be comp letely diﬀerent, and
+this could have a dramatic eﬀect on not only runtime performa nce, but the
+descriptive complexity of the model. This would be the resul t of changes to
+the structure of function signatures and the use of auxilary data structures to
+reduce register pressure, just as a human programmer would d o if faced with
+similar constraints. Earlier, in the Introduction section, the possibility to ha ve both legibility and
+eﬃcacy without sacriﬁcing either was mentioned. How might t hat be achieved? One way is that we utilize multiple modes. The default mode of the TML
+system would be to produce programs that are less eﬃcient, bu t easier for us to
+understand. Then, once we understand the relevant parts of t he source model,
+we could instruct it to conduct a (super-)optimization pass . The TML would perform a translation between the original pro gram and its
+more eﬃcient and eﬀective representation, which we may unde rstand substan-
+tially less. Nothing would be lost, however, as it would be required to establish
+a rigorous mapping between the unoptimized version and the o ptimized one. This would be done by using the so-called de Bruijn criterion , which would
+see it emit a full trace of “proof objects” in a format that cou ld be externally
+veriﬁed with a simple proof checker that we verify by hand and implicitly trust
+[38]. This would, in eﬀect, give us the best of both worlds.
+4 Implementation
+How might transparent machine learning be implemented? The purpose of this
+paper is to begin an investigation to answer that very questi on. All that can
+9 be provided right now is a list of suggested directions we mig ht take. It is
+expected that a great deal of research will be required to ﬁnd even a modest
+implementation of TML.
+4.1 Early Stages
+The ﬁrst recommended direction would be to develop a ﬂexible grammar engine
+based on term-rewriting with capture-avoiding substituti on. This would need to
+be extremely eﬃcient. A type system could be developed withi n it. Dependent
+types are not considered a requirement for an initial proof- of-concept. It is not currently known whether or not it would be better to b ase such a
+system on the simply-typed Lambda calculus or if it is best to have the ability
+to arbitrarily specify formal grammars in a more open-ended fashion. That is
+an open question likely to draw strong opinions from various researchers. After the grammar engine, the next step might be to see how thi s could be used
+for program search and program generation. Of particular im portance is the
+need to conﬁne the search space by ensuring that only the corr ect forms for the
+language are generated. This sounds simple in theory, but it is confounded by
+context in practice. This is because there is a distinction b etween the syntax of
+a programming language and its semantics. One possible aid to this may come from something called the Mo rphological
+Approach [ 39]. This, however, is more of a way of thinking about the proble m
+space than a speciﬁc engineering solution. The usefulness o f that approach is
+in using it to ﬁnd the internal consistencies of a particular grammar and the
+corresponding semantics of its programs. This would then be used to enhance
+the grammar engine so that it always remained correct with re spect to the
+particular programming language it was generating. A more conventional approach would see the use of operationa l semantics [ 40,41,
+42,43], but how that would be eﬃciently integrated with the propos ed grammar
+engine is unclear. After those steps, the greatest initial obstacle will be the labeling problem. This
+could be addressed early on with the use of labeled training d ata. Research into
+“semi-weak” supervised learning [ 44,45] may also be used to help with the
+process. Alternatively, there is the prospect of creating a website where labels
+for training data could be crowdsourced with help from the ge neral public. Of
+course, that brings its own challenges, as it would have to be ﬁltered for spam,
+checked for accuracy, and normalized against bias.
+4.2 Research Directions
+Below are some suggested research directions. While certai nly not exhaustive, it
+should provide more than enough for experimentation and ana lysis in the early
+stages of developing transparent machine learning algorit hms. Each subsection
+will include a number of linked references and will be listed , more or less, in
+ascending order of diﬃculty.
+10 4.2.1 Intermediate Representations
+This approach could be helpful in providing a way to manipula te and structure
+various programming languages and data formats. Regardles s of which one is
+chosen, it is highly likely that some form of intermediate re presentation (IR) is
+going to be necessary to organize the structure of the source models for TML. The s-expressions [ 46] found in the Lisp programming language, and its many
+variants, are a signiﬁcant potential candidate for an IR, an d would have the
+added beneﬁt of being directly accessible as part of an inter active programming
+environment. However, this should not discourage the use of other formats, as
+the ability to read and write interchange formats is ubiquit ous in practice, and
+is supported in some capacity by most general-purpose progr amming languages. Care, however, must be taken in the choice of the IR. There wil l be overhead in
+its translation and processing. And, because of the burden o f proof requirements
+on translation, it will need to be representative of the targ et languages without
+loss of information.
+4.2.2 Interpreted Languages
+Early stage TML may be far simpler to explore with an interpre ted language,
+especially if it has a homoiconic structure or metacircular [47] capability. Lisp
+dialects come to mind, but the use of an interpreted language need not be
+restricted to those forms. The intent is to provide universa l support for self-
+modiﬁcation, regardless of hardware or operating system su pport. It may be useful to create a universal or open framework for th e manipulation
+and representation of programming languages. The goal of su ch a project would
+be to allow programs in one language to analyze and transform the source code
+of itself or another program, regardless of the programming language. The main drawback to using interpreted languages, compared to native compi-
+lation, is the penalty to runtime performance and memory uti lization. While
+memory use could be reduced, the cost of interpretation is un avoidable. Any-
+thing other than the native instruction set is going to incur a penalty. One tech-
+nique to mitigate this is the construction of threaded inter preters [ 48], which
+essentially use a computed form of goto when evaluating instructions. Both
+GCC and LLVM have extensions that support taking the address of a label,
+which can be used for this purpose.
+4.2.3 Bit-Level Languages
+A bit-level language should not be confused with the notion o f interpretable byte
+code, though they are highly related. The main diﬀerence is t hat bit-level lan-
+guages are programming languages with an ultra-compact rep resentation. They
+are typically used to study information theoretic and algor ithmic complexity
+properties of program descriptions. Notable examples incl ude binary represen-
+tations for the lambda calculus [ 49,50].
+11 The parsimony of these languages could be of beneﬁt to super- optimization and
+model search, but at cost of having to translate them into rep resentations that
+we can understand. They are also arguably less eﬃcient than e quivalent byte
+code due to the need to unpack bits. On x86, for example, byte- aligned accesses
+for opcodes would allow directly indexing an instruction ta ble for the purposes
+of implementing a threaded interpreter. To do this in a bit-l evel language the
+program would have to perform several operations before an a rray index or table
+oﬀset could be calculated.
+4.2.4 Just-In-Time Compilation
+The primary beneﬁt of JIT compilation is that it combines the beneﬁts of (self-
+)interpretation with eﬃciency. This would be especially us eful if a TML system
+needed to perform real-time updates during deployment. Gen erally speaking,
+the faster a TML system runs, the more eﬀective it will be at ap proaching
+optimal solutions. Speed, however, is not the only consideration. Work towards the acceleration of
+program search and program generation is ultimately going t o be a losing battle. While early eﬀorts should be made to improve the operational eﬃciency of TML
+systems, we must not lose sight of the fact that it is the asymptotic behavior of
+these system that matters; for niterations in program search, O(log n) is vastly
+superior to O( n) when nis large. And the (micro-)optimization aﬀorded by
+faster interpreters and program execution only represents a reduction of kin
+O(n+k) for the same n. It should be seen as a measure of “intelligence” that one TML s ystem requires
+fewer nthan another to obtain a source model. This would remain true even
+if the models it produced were less eﬀective. Even more so if t he reduction
+in iterations was signiﬁcant. Such a TML system would need to be studied in
+isolation to ascertain how it was able to move through the pro gram search space
+in such a way. This also hints at the possibility of using TML to improve its elf. This is related
+to the ﬁeld of meta-optimization [ 51,52,53,54,55].
+4.2.5 Metamorphic Code
+Metamorphic code is a program that is capable of rewriting it self in a potentially
+diﬀerent representation [ 56,57,58]. This would make a TML system capable of recognizing, disasse mbling, and
+rewriting itself in pure machine code. The target language f or the source code
+model becomes the instruction-set architecture of the CPU. At ﬁrst glance, it would seem that having such a low-level rep resentation would
+defeat the purpose of legibility, but this is not necessaril y the case. An IR could
+be used, with a provable inverse, that carried the additiona l information about
+the machine code so that the representations could be presen ted side-by-side,
+with no loss of ﬁdelity.
+12 A metamorphic program shares some overlap with JIT compilat ion in the sense
+that it combines runtime eﬃciency with the ability to update itself continuously. However, a distinction needs to be made between online and oﬄ ine updates. An online update is what a JIT performs for a language with som e form self-
+interpreting capability, such as eval() . By contrast, an oﬄine update is where
+a metamorphic program modiﬁes its own executable in the ﬁle s ystem. This is
+not an activity that a JIT would traditionally be expected to perform. A standard program could be made to incorporate self-update s by loading and
+unloading shared libraries while it is running, but this is n o where near the
+capability of a metamorphic program. The most important consequence of a metamorphic engine is th at it can manip-
+ulate other programs in machine code form. This capability, when combin ed
+with TML, would give it the ability to modify compiled progra ms, regardless
+of the language they were originally written in. And, if the l abeling problem
+were in its late stages of being solved, it would prove to be a m ost eﬀective
+disassembly and reverse engineering tool. In its full form, TML could be used
+to forcibly “open source” executables. This would have a sig niﬁcant impact on
+cybersecurity.
+4.2.6 Simulated Annealing
+Simulated annealing is a powerful metaheuristic for global optimization [ 59,60,
+61,62]. It may be especially applicable to the development of TML s ystems,
+as program generation is discrete and covers a large search s pace. Parallel
+simulated annealing, as discussed in [ 63,64,65,66,67], may be of special
+interest to accelerating TML program search.
+4.2.7 Accelerated Processing
+One of the greatest catalysts for modern ML is likely the fact that these algo-
+rithms are so readily parallelized. This gives them the oppo rtunity to exploit
+the tremendous speedup from operating over general-purpos e graphics process-
+ing (GPGPU) architectures. That is a very important propert y, as not all
+algorithms are created equally in this regard. The question must be asked: Does this same advantage apply to transparent
+machine learning? Can the grammar engine at the core of TML, o r something
+equivalent to it, be implemented in a compute shader? And, in general, can
+program search and program generation be done in a massively parallel fashion? If L-systems are any indication, then the answer to this ques tion might be in the
+aﬃrmative, as demonstrated in [ 68,69]. An L-system, or Lindenmayer system, is
+a type of rewrite system that can be used to produce complex, f ractal-like images
+and animations for computer graphics [ 70]. They are naturally parallelizable,
+however, and may be insuﬃcient in power to iterate over a gene ral program
+space. Regardless, studying how these algorithms are used i n graphics hardware
+could result in a transfer of knowledge to the TML domain.
+13 If it turns out to be too diﬃcult to write a grammar engine of su ﬃcient complex-
+ity in shader form, then the next best option is to use a CPU-ba sed method to
+target graphics accelerated hardware. There has been some v aluable work done
+using rewrite systems in this way to generate OpenCL and comp ute shaders for
+GPGPU purposes [ 71,72]. There is also PyCUDA and PyOpenCL [ 73]. And
+of relevance may be automatic termination analysis for GPU k ernels [ 74]. The problem with generating code for accelerated hardware i s that it limits
+updates and throughput. It also signiﬁcantly complicates v eriﬁcation. The
+ideal realization would be a “pure” GPU TML engine. In princi ple, such a
+system would run entirely within the graphics pipeline, and it would not require
+recompilation, except in the most extreme cases where the TM L engine was
+being changed itself. One approach to a pure GPU solution may be to ﬁnd mappings betw een rewrite
+operations and data parallel instructions in the shader lan guage. Another approach, though highly speculative, would be to em ulate a distributed
+virtual machine entirely on the GPU. The TML system would the n be executed
+in that environment. It should be noted that this is distinct from the research
+on making GPU-accelerated hardware accessible to a virtual machine instance. By contrast, this approach would implement the TML system wi thin the virtual
+instruction set being emulated by one or more shaders. Even if the above methods succeed, it will still present chal lenges for systems
+level access and general input-output. In all likelihood, a hyrbid CPU-GPU
+approach will be required, and this will, unfortunately, co mplicate the source
+models generated by TML; it implies multiple target languag es and data for-
+mats, along with the additional overhead that brings. Optim izing for both the
+CPU and GPU portion of a TML source model could be an extremely complex
+challenge. It may be far simpler in the early stages to create CPU-based TML
+models and then treat the GPU target as an optimization pass.
+4.2.8 Machine Consciousness
+The largest obstacle to full transparent machine learning i s going to be the
+labeling problem. While various methods for labeling and classiﬁcation are li kely to be developed,
+the author believes that they will reach a hard limit without a fundamental
+advance in our understanding of artiﬁcial intelligence. A basic component of that limit is related to something calle d the grounding
+problem , which is concerned with how the symbols in any mental or cogn itive
+model could be given meaning [ 75]. Instead of symbols, however, in the context
+of TML, we have the inhabitants, elements, or objects of one o r more data types. And instead of a connectionist architecture, we are constra ined to source code
+we can understand in one or more programming languages. A full solution to the labeling problem must include an answe r to the grounding
+problem. There will be many other challenges for legibility , but this is the most
+important ﬁrst step towards a comprehensive solution.
+14 One way of approaching this problem would be to mimic conscio usness. In
+particular, the phenomenology of our subjective experienc e. This would mean
+creating one or more streams of information for sensory perc eption and then
+combining them into a uniﬁed whole. These could then be used t o build episodic
+memories that can be referred to by the learning system, eﬀec tively grounding
+its representations in a form of artiﬁcial sentience . It may be helpful to think of the primitives for this sensory d ata as fragments
+of experience , not unlike the texture fragments manipulated in graphics s haders. In fact, that may be a most useful analogy for thinking about h ow such data
+would be combined and processed in a real implementation, es pecially given the
+distributed and parallel nature of our biology. There is another aspect to this future direction that should be discussed as well. It is the importance of time, and how it is consistently overl ooked in how we
+currently design, build, and think about AI. The author strongly believes that any possible approach to r esolving machine
+consciousness must be done with respect to time. It is not suﬃcient to merely
+involve agents in some perception-feedback loop. It has to b e much more funda-
+mental than that; the very meaning of the fragments of experience must co-vary
+with the relative timeframe in which they are interpreted. While this may all seem philosophical, it has an important co nnection to any
+technical realization of machine consciousness: it demand s the use of a hard real-
+time system . Whatever perceptual processing is done, it will need to be d one
+under strict deadlines, otherwise it will change the interp retation and meaning
+of the experience. This is contrasted to a soft real-time sys tem, where missing
+some deadlines is not considered to be a failure. See [ 76] for more information
+on real-time computing. The reason artiﬁcial sentience must be developed under hard real-time con-
+straints is because its meaning co-varies with time. Consid er an audio recording
+of someone saying “one, two, three” . Imagine playing this ba ck at one-quarter
+speed. While we could eventually make out what it is saying, a nd recover the
+number sequence, that sequence would not represent the tota lity of the infor-
+mation about the recording. The experience of listening to it comes ﬁrst, and
+ourinterpretation of that experience is secondary. All of this would make machine consciousness, and the transp arent machine
+learning systems built over it, akin to a simulation. This ap proach would form
+the basis for a cognitive architecture , which opens up the possibility of building a
+more general-purpose framework for studying artiﬁcial int elligence as subjects of
+experience. And there is even more to discuss on this topic2, but, unfortunately,
+it would be far beyond the scope of this article. This was pres ented only as a
+potential research direction towards solving the labeling problem.
+2See also: “Machine Consciousness”, AI Security (Juliano, 2 016).
+15 5 Theoretical Limits
+Will human understanding in TML scale as the overall complex ity of its models
+increase? Is there a threshold of program complexity beyond which transparent
+MLnecessarily degenerates to opaque ML? A distinction must be made between program legibility and th e ease in which
+it can be understood. This is not to contradict the standard t est of reasonable
+competence set previously in the deﬁnition of TML. It is mean t to facilitate dis-
+cussion about the theoretical limitations of TML source mod els at the boundary
+of maximum model complexity and complete human understandi ng. Like natural language, source code can entail complex logic , mathematics, al-
+gorithms, and patterns that one can recognize as correct sta tements of the
+language, but would otherwise require years of study to full y understand. It is useful then to imagine a TML system that, while fulﬁllin g its stated obliga-
+tions, reaches a point where it starts to produce models that are so sophisticated
+that its burden of satisfying human legibility begins to wea ken its expressive
+power. To help discuss this, two complementary deﬁnitions from Yam polskiy [ 77] on
+the foundations of AI will be considered:
+1. Unexplainability: For certain decisions made by an intelligent system
+there will be no explanation that is both 100% accurate and co mprehen-
+sible to humans.
+2. Incomprehensibility: Certain decisions made by an intelligent system
+will have a 100% accurate explanation for which no human can c ompletely
+understand. The ﬁrst step in addressing these claims is that we must consi der the distinction
+between opaque ML and transparent ML. In TML, the explanatio n isinseparable
+from the model, because it is the model. And that model may als o include the
+description of the TML system itself. A separate description that explains an opaque ML model may b e of low ac-
+curacy and it will not aﬀect the deployment of that model. Thi s is not the
+case with TML, as the description and the model are not just eq uivalent to
+each other, they are the same object. So, any description of a TML model is of
+maximum accuracy by deﬁnition. This simpliﬁes at least one part of the analysis: there are no inaccurate descrip-
+tions of models while remaining within the framework of TML. Every TML
+system must produce models that are valid programs. This is b ecause every
+TML model has a source code component that must be recognized by a com-
+piler or interpreter for the target languages, which, by the TML requirements,
+must include at least a syntax and type check. The TML system t hen performs
+additional checks during program search, program generati on, and runtime eval-
+uation based on a balance of priorities for program complexi ty and model ﬁtness. While the author acknowledges the possibility of there bein g written documen-
+tation, scientiﬁc theories, or mathematical theorems resu lting from knowledge
+16 gained from a TML model, these must be seen as supplemental. T he deﬁnition
+given in (1) for unexplainability entails a spectrum of comp rehensibility that
+co-varies with the accuracy of descriptions for machine lea rning models. As
+the description for a TML model is inseparable and exact by de ﬁnition, this
+makes accuracy a constant factor, leaving only comprehensi bility. Under such
+an interpretation, this eﬀectively reduces claim (1) to cla im (2), which should
+not be surprising, as they are complementary to begin with. U nder TML they
+are simply equivalent. This is a necessary ﬁrst step towards addressing incomprehe nsibility. The rest
+of the subsections will proceed based on this clariﬁcation.
+5.1 Legibility
+In TML, program legibility is intended to be synonymous with human compre-
+hensibility, which was given in terms of reasonable standar ds of skill. The system has to take this legibility requirement into acco unt when performing
+its search. This means that not only is a model’s description or explanation
+inseparable from its construction, the eﬀect of legibility on program complexity
+is necessarily a part of the search for the model. The model do es not come
+ﬁrst; legibility is not evaluated, but likely a fundamental part of the generative
+process. That is another way in which it is so distinct from op aque ML. Legibility places a constraint on the space of all possible p rograms that TML
+can generate, limiting it to only those programs that necess arily satisfy user-
+deﬁned legibility. That will exclude otherwise valid progr ams from the search
+space, and is highly relevant when interpreting claim (2) of incomprehensibility. We will not get incomprehensible models if a TML system is ope rating correctly. This can be seen as (2) placing a maximum upper-bound on TML mo delef-
+fectiveness in the limit of program legibility. This would be caused by a T ML
+system not being able to adequately express programs becaus e they do not com-
+bine in such a way as to satisfy expected results from the inpu t training data. It was suggested in the section on program complexity and mod el ﬁtness that
+we utilize multiple representations, provided that we have a provable inverse. The problem with this is that it shifts the burden of legibili ty to ﬁnding highly
+expressive instruction sets and programming languages wit h inverses that pro-
+duce models we can reverse engineer into legible data struct ures, algorithms,
+and programming patterns. While probably easier than inter preting deep neural
+networks [ 78], it would still be an oblique approach to the problem of legi bility. One might try to have a TML system optimize its ability to make legibile pro-
+grams in an eﬀort to strengthen its expressive power. That wo uld be diﬃcult,
+as TML relies upon a user-deﬁned notion of what it must consid er to be legible,
+which was previously referred to as a set of programming patt erns. It has no
+general criterion for what any human would consider more or l ess preferable in
+terms of legibility, and this limitation would still apply e ven if general intelli-
+gence were to be involved. This can be observed in the fact tha t even diﬀerent
+human programmers have widely varying standards program qu ality.
+17 5.2 Groups
+Consider the billions of lines of code in all of the actively m aintained and publicly
+available free and open source software projects that curre ntly exist. These are
+developed and maintained by one or more human programmers, s ome with the
+aid of automation in varying capacities. Each of these indiv iduals have their
+speciﬁc talents, knowledge, and areas of expertise. It is inconceivable that any oneof us could ever fully understand allof these
+projects in totality. This is direct evidence for claim (2) i n the more general sense. Even though the individual parts of this collective work are in fact understood
+by those working on it, the sheer volume of all these projects in combination
+would necessarily exceed human ability to follow. That evidence, however, also contains a strong counter-cla im. By adding one
+more human we have been able to scale with the growing complex ity in software
+and hardware. We specialize and work in teams. Even if we are n ot directly
+communicating or collaborating, our combined eﬀorts are a f orm of collective
+human understanding. This is not an implicit argument for em ergence, but
+a statement of fact that we do overcome immense complexity th rough group
+eﬀort. These same arguments apply to the totality of human knowledg e in general,
+but the speciﬁc case of source code projects was used because it exempliﬁes
+the kind of complexity we might anticipate from TML models of extraordinary
+sophistication. Consider a TML model that has grown in complexity to the exten t that it is
+in the hundreds of billions of lines of code. If each of the par ts of the model
+satisﬁed the legibility requirements of the TML deﬁnition t hen there is no reason,
+in principle, that we could not scale to the challenge by addi ng one more human
+to the problem, and repeating that step until we have collect ively understood it
+well enough. Unfortunately, if it turns out to be the case that a full-spec trum general AI, or
+superintelligence, must necessarily involve a model of suc h size, then we may
+ﬁnd ourselves unable to respond quickly enough to anticipat e it, despite being
+able to comprehend its description through a concerted grou p eﬀort. In such a case, the author suggests that we construct a trusted sequence of
+artiﬁcial intelligence where each element has a strictly in creasing ability to com-
+prehend its successor better than its predecessor. This wou ld still incur delays
+in prediction and analysis, but at possibly shorter timesca les than that of a
+comparative group eﬀort made by humans.
+5.3 Data
+It was anticipated that there might be a need for data to accom pany the pro-
+grams representing complex TML models. It is for this reason that the ability
+to target data formats and markup languages was explicitly i ncluded in the
+deﬁnition.
+18 But how does that relate to incomprehensibility? Consider a TML model that was equal or better than us at recogn izing human
+faces. It is reasonable to expect that it would have both a dat a and source code
+component. This would mean that the TML system would need to t arget at
+least two distinct languages, with one of them being a data or markup language
+and the other being a programming language. The data part of the TML model might be a listing of the numeric values
+for the symmetries and structures it had found for the faces i n the training
+data. That might include composite models or topological in formation in its
+own unique encoding. The author argues that this would be analyzable by data
+scientists, even if they had to ﬁrst ﬁnd a more meaningful rep resentation or data
+visualization technique. On the source code side, the model would use that data in queri es or lookups
+to simulate, project, or manipulate incoming image data thr ough the use of one
+or more algorithms and data structures. While the goal of TML is to produce legible programs, this doe s not necessarily
+apply to the content of the targeted data languages. In other words, while the
+data languages used must be legible to us, and their statemen ts well-formed,
+this does not mean that the data will be anything other than ju st a direct
+representation of the information that is vital to the operation of the sourc e
+model. It is the design intent of TML that the data structures, algor ithms, and pro-
+gramming patterns ultimately determine legibility, even t hough what is legible
+is user-deﬁned. While data will play a role in the constructi on of the particular
+models, it should not be taken as a limit on model eﬀectivenes s, legibility, or
+complexity. On the other hand, that design intent must not be used as an exc use to make
+space versus time trade-oﬀs that reduce program complexity while sacriﬁcing
+overall clarity. This could be taken as a qualiﬁcation on the legibility condi-
+tion. The purpose of including data language targets was to m ake a practical
+distinction between programs and data, even though they are both a form of
+information. A TML system should minimize the data portion of its model whi le simulta-
+neously maximizing program legibility, without sacriﬁcin g the other competing
+priorities on complexity and model ﬁtness. Following the example given, it is reasonable to accept that the geometric sym-
+metries in millions of human faces might be represented best in a numeric inter-
+pretation, even though an algorithm could be presented that generates it with
+a much shorter description. The TML model that produces that data would,
+in fact, be one example of such an algorithm, for the simple fa ct of having gen-
+erated it. That, however, does not mean that the TML model and itstraining
+data should be admitted as an explanation of human facial rec ognition. What we seek in practice is a generalization of that training data in the form
+of a model, without the need for its speciﬁc examples again in the future. The
+data portion should be taken as the information portion of th e TML model
+19 that could not be eﬀectively represented in source code form , or was otherwise
+classiﬁed as the input to the source code portion of the model . The TML approach makes an intentional distinction between d ata and source
+code for this purpose. It reduces the length of programs and e nables alternative
+constructions to accelerate them. It is the data side of TML that can be used to spare it from claim (2), which
+would permit the source code to remain legibile as overall mo del complexity
+increases. A data set may very well be incomprehensible to us, but would n ot prevent us
+from analyzing, visualizing, and studying it. There is noth ing, in principle, that
+prevents such data from being the useful input to algorithms wedounderstand. Additionally, the quantity of the data need not aﬀect our und erstanding of the
+algorithms that use it, but it could add time to an analysis of the model as a
+form of knowledge.
+5.4 Output
+As TML models are just computer programs, the study of algori thms and com-
+putation directly apply to every model produced by any possi ble TML system. The following analysis will focus on the output of these mode ls by approaching
+it from the perspective of algorithms and computation. In th is context, and un-
+less noted otherwise, the word “model” should be considered as a TML model,
+which makes it synonymous with the word “program” . Where it m akes sense,
+these terms will be used interchangeably for the remainder o f this section. It is possible to understand the description of a program whi le not being able
+to easily predict its runtime behavior [ 79]. Such runtime behavior can further
+be divided into the internal state of the program and its outp ut, with the latter
+being most relevant to this analysis. This brings up an important point about program legibility i n the deﬁnition of
+TML. The goal of this approach is to produce models that we understand, and
+every model that is generated by TML should produce behavior that is useful,
+according to some user-deﬁned criteria for model ﬁtness. Th e deﬁnition of TML
+does not specify any requirement on the predictability or co mprehensibility of
+the runtime behavior of these programs, and there are severa l reasons for this. The comprehensibility of model output is not contingent upo n our ability to
+predict that output in advance. Safety notwithstanding, we can still beneﬁt
+from models we can not predict, just as we do with natural inte lligence; we do
+not need to predict the wording of the next scientiﬁc paper fo r that result to be
+both comprehensible and useful to us. It may even be the case that the unpredictability of model out put is impossible
+to avoid [ 80] or is an otherwise necessary condition for the most eﬀective models. Instead of a limitation, however, the author argues that suc h a property of model
+output could be interpreted as novelty or creativity, which would be a highly
+desirable outcome. This should be possible, at least in prin ciple, as TML has
+20 the ability to sample from the space of all possible programs . But how would
+that enable such output characteristics? Consider a model with one or more nondeterministic algorith ms [81], each of
+which are using external input in a stream of unbounded proce ssing. Now give it
+suﬃcient memory and storage so that the program can refer to p revious external
+inputs and runtime states. Such a model would have the potent ial to generate an
+unbounded amount of new information from an otherwise ﬁnite initial program
+description. And there is no reason to believe that TML would not be able to
+produce such models in theory. So, if unpredictability of output is unavoidable for the mos t eﬀective models, and
+even a desirable indicator of novelty, then that leaves only the comprehensibility
+of that output to consider. Suppose it is possible for full-spectrum general intellige nce or artiﬁcial superin-
+telligence [ 6] to be represented as programs. These kinds of AI would then f orm
+a subset of the set of all possible programs. Now devise a TML s ystem that is
+instructed to include that subset within its search space. T his would lead to
+one of the following outcomes:
+1. These advanced models would not be found by any TML system, as the
+human legibility requirements would preclude it from expre ssing models
+at that level of sophistication.
+2. It would ﬁnd one or more models at that level of sophisticat ion, and we
+would understand them, but they would produce output that we can not
+understand, even with a group eﬀort. The author believes that the second scenario is the most like ly outcome. This
+represents a much worse result, however, as it strengthens t he case for a dif-
+ferent kind of incomprehensibility. We would, in principle , have the ability to
+understand some of the most sophisticated AI models possibl e, but the price
+would be that its outputs would be incomprehensible to us. There are a couple of ways in which the output of such models mi ght become
+incomprehensible. It could be at a level of abstraction or so phistication that is
+beyond human ability to follow. Even if we could eventually ﬁ nd one or more
+people to specialize in the knowledge it produced, it may tak e us too long, and,
+by then the model might have produced something even more com plex. This
+ties in with the next concern, which is the rate at which these models could
+produce novel output. If done at scale, it could preclude hum an understanding
+even under a collective interpretation. One can imagine humanity falling behind an exponential curv e of incomprehen-
+sibility from such models of intelligence. Even if our entir e population perfectly
+coordinated and specialized in the knowledge it was amassin g, we might never
+hope to keep up.
+21 6 Closing
+Transparent machine learning has been introduced as a possi ble alternative di-
+rection in machine learning. It would give us the ability to p roduce explicit AI
+that we can study, verify, and reﬁne. This would transform th e way we inte-
+grate automation with our technology by leveraging the exis ting hardware and
+software development processes that are commonplace today . More importantly, TML answers the question of how we might co ntrol AI, both
+now and in the future. Having the source code to the implement ation is a
+common sense prerequisite, and one that TML would provide. T his would allow
+us to ensure that these systems behave exactly as we expect an d enable us to
+program them to exacting speciﬁcations, in the most transpa rent and veriﬁable
+way possible. That includes codifying our ethical norms and laws within these
+systems. While TML does not address how we decide or translat e our values into
+that form, it does ensure that it will be an explicit part of th e implementation. And it will be present in a form that we can directly check. The beneﬁts of learning from TML source models can not be over stated. This
+could be of aid to an early form of automated science, where wo rking theories
+are generated directly from data. Domain-speciﬁc language s could be used
+to translate source code to and from the language used by spec iﬁc scientiﬁc
+disciplines. This may be one of the most direct routes to cons tructing automated
+research assistants until the discovery of general AI has be en made. It only takes
+a willingness to see source code as a form of knowledge. To balance the beneﬁts of TML, a warning and disclaimer must a lso be given. As
+with any new technology, there is a signiﬁcant potential for misuse of TML. By
+deﬁnition, TML has the ability to read and write source code. If combined with
+a metamorphic engine, this would also give it the ability to r ead and write any
+program it can access, without the need to execute it. This in cludes updatable
+hardware as well. Metamorphic software with AI capability has to be treated as its own class of
+malware. The very same creative tools that will advance TML r esearch can
+also be used to destroy. The upper limit on what this kind of ma lware can do
+should be treated as equivalent to what a human operator woul d be able to do
+with physical access to a compromised system. While that ful l threat potential
+is not realizable now, it may become reality later when TML be comes more
+sophisticated. The suggested defensive action with TML is to utilize it to ha rden individual
+programs and networks. An API could be developed that expose s the network
+directly to the target language. The TML system could then be instructed to
+make program search and generation with that API a part of its model. This
+could, in principle, enable it to manipulate and explore tha t network through
+the use of the API, ﬁnding vulnerabilities and other ﬂaws in s ecurity. The true power of TML is that it can be used to search, iterate, and generate
+sequences over arbitrary formal grammars. And it could be em ployed for any
+problem domain that can be described in such a way. It is disti nct from conven-
+tional ML because TML could do this with little or no training data whatsoever.
+22 This is because it exploits the formal structure of the gramm ar. Consider the
+case where that grammar entails genetic, chemical, or physi cal models. As long
+as a reasonable measure of ﬁtness could be developed, then TM L could be used
+to investigate the space of sequences for the respective tar get domain without
+it having to necessarily be a computer program. Lastly, the pursuit of full TML will likely converge with res earch directions for
+general AI. These technologies would be complementary to ea ch other, espe-
+cially in terms of trust and security. The labeling problem w ill be the greatest
+challenge going forward, and it may require research into ma chine consciousness
+to resolve. That, in turn, could help unlock new ways of think ing about general
+AI, which could and should be considered the ultimate object ive of TML related
+research.
+7 References
+[1] Wojciech Samek, Thomas Wiegand, and Klaus-Robert Mülle r. “Explain-
+able artiﬁcial intelligence: Understanding, visualizing and interpreting
+deep learning models”. In: arXiv preprint arXiv:1708.08296 (2017).
+[2] Shixia Liu et al. “Towards better analysis of machine lea rning models: A
+visual analytics perspective”. In: Visual Informatics 1.1 (2017), pp. 48–56.
+[3] David Gunning. “Explainable artiﬁcial intelligence (x ai)”. In: Defense Ad-
+vanced Research Projects Agency (DARPA), nd Web 2 (2017).
+[4] Andrew W Appel et al. “Position paper: the science of deep speciﬁcation”. In:Philosophical Transactions of the Royal Society A: Mathema tical, Phys-
+ical and Engineering Sciences 375.2104 (2017), p. 20160331.
+[5] Roman V Yampolskiy. “AI-complete, AI-hard, or AI-easy– classiﬁcation of
+problems in AI”. In: The 23rd Midwest Artiﬁcial Intelligence and Cognitive
+Science Conference, Cincinnati, OH, USA . 2012.
+[6] Nick Bostrom. Superintelligence: Paths, Dangers, Strategies, Reprint e d. Oxford: Oxford University Press, 2016.
+[7] Krishnamurthy Dvijotham et al. “A Dual Approach to Scala ble Veriﬁca-
+tion of Deep Networks.” In: UAI. 2018, pp. 550–559.
+[8] Gagandeep Singh et al. “Fast and eﬀective robustness cer tiﬁcation”. In:
+Advances in Neural Information Processing Systems . 2018, pp. 10802–
+10813.
+[9] Tsui-Wei Weng et al. “Towards fast computation of certiﬁ ed robustness
+for relu networks”. In: arXiv preprint arXiv:1804.09699 (2018).
+[10] Sanjit A Seshia, Dorsa Sadigh, and S Shankar Sastry. “To wards veriﬁed
+artiﬁcial intelligence”. In: arXiv preprint arXiv:1606.08514 (2016).
+[11] John C Martin. Introduction to Languages and the Theory of Computation . Vol. 4. McGraw-Hill NY, 1991.
+[12] Noam Chomsky. “On certain formal properties of grammar s”. In: Infor-
+mation and control 2.2 (1959), pp. 137–167.
+[13] Peter Naur. “Programming languages, natural language s, and mathemat-
+ics”. In: Communications of the ACM 18.12 (1975), pp. 676–683.
+23 [14] Andrei N Kolmogorov. “Three approaches to the quantita tive deﬁnition of
+information”. In: Problems of information transmission 1.1 (1965), pp. 1–
+7.
+[15] Gregory J Chaitin. “On the length of programs for comput ing ﬁnite binary
+sequences”. In: Journal of the ACM (JACM) 13.4 (1966), pp. 547–569.
+[16] Claude Elwood Shannon. “A mathematical theory of commu nication”. In:
+Bell system technical journal 27.3 (1948), pp. 379–423.
+[17] Chris S Wallace and David M Boulton. “An information mea sure for clas-
+siﬁcation”. In: The Computer Journal 11.2 (1968), pp. 185–194.
+[18] Chris S. Wallace and David L. Dowe. “Minimum message len gth and Kol-
+mogorov complexity”. In: The Computer Journal 42.4 (1999), pp. 270–
+283.
+[19] David L Dowe. “MML, hybrid Bayesian network graphical m odels, statis-
+tical consistency, invariance and uniqueness”. In: Philosophy of statistics . Elsevier, 2011, pp. 901–982.
+[20] Leonid Anatolevich Levin. “Universal sequential sear ch problems”. In:
+Problemy peredachi informatsii 9.3 (1973), pp. 115–116.
+[21] Raymond J Solomonoﬀ. “Optimum sequential search”. In: Memorandum,
+Oxbridge Research, Cambridge, Mass (1984).
+[22] Ray J Solomonoﬀ. “Progress in incremental machine lear ning”. In: NIPS
+Workshop on Universal Learning Algorithms and Optimal Sear ch, Whistler,
+BC. 2002.
+[23] M. Gagliolo. “Universal search”. In: Scholarpedia 2.11 (2007). revision
+#152144, p. 2575. doi:10.4249/scholarpedia.2575 .
+[24] Henry Massalin. “Superoptimizer: a look at the smalles t program”. In:
+ACM SIGARCH Computer Architecture News . Vol. 15. 5. IEEE Computer
+Society Press. 1987, pp. 122–126.
+[25] Torbjo rn Granlund and Richard Kenner. “Eliminating br anches using a
+superoptimizer and the GNU C compiler”. In: cal5.1 (1992), r4.
+[26] Bob Cmelik and David Keppel. “Shade: A fast instruction -set simula-
+tor for execution proﬁling”. In: Fast simulation of computer architectures . Springer, 1995, pp. 5–46.
+[27] Rajeev Joshi, Greg Nelson, and Keith Randall. Denali: a goal-directed
+superoptimizer . Vol. 37. 5. ACM, 2002.
+[28] Martin Brain et al. “TOAST: Applying answer set program ming to
+superoptimisation”. In: International Conference on Logic Programming . Springer. 2006, pp. 270–284.
+[29] Sorav Bansal and Alex Aiken. “Automatic generation of p eephole super-
+optimizers”. In: ACM Sigplan Notices . Vol. 41. 11. ACM. 2006, pp. 394–
+403.
+[30] Eric Schkufza, Rahul Sharma, and Alex Aiken. “Stochast ic superoptimiza-
+tion”. In: ACM SIGPLAN Notices . Vol. 48. 4. ACM. 2013, pp. 305–316.
+[31] Edwin Brady. “State Machines All The Way Down”. In: (201 6).
+[32] Karthikeyan Bhargavan et al. “Everest: Towards a veriﬁ ed, drop-in re-
+placement of HTTPS”. In: 2nd Summit on Advances in Programming Lan-
+guages (SNAPL 2017) . Schloss Dagstuhl-Leibniz-Zentrum fuer Informatik.
+2017.
+[33] Xavier Leroy et al. “The CompCert veriﬁed compiler”. In :Documentation
+and user’s manual. INRIA Paris-Rocquencourt 53 (2012).
+24 [34] Gerwin Klein et al. “seL4: Formal veriﬁcation of an OS ke rnel”. In: Pro-
+ceedings of the ACM SIGOPS 22nd symposium on Operating syste ms prin-
+ciples . ACM. 2009, pp. 207–220.
+[35] David A Turner. “Total Functional Programming.” In: J. UCS 10.7 (2004),
+pp. 751–768.
+[36] Yngve Sundblad. “The Ackermann function. a theoretica l, computational,
+and formula manipulative study”. In: BIT Numerical Mathematics 11.1
+(1971), pp. 107–119.
+[37] HJ Lu et al. “System V application binary interface”. In :K1OM Archi-
+tecture Processor Supplement, v1. 0 (2018).
+[38] Herman Geuvers. “Proof assistants: History, ideas and future”. In: Sad-
+hana 34.1 (2009), pp. 3–25.
+[39] Fritz Zwicky. “The morphological approach to discover y, invention,
+research and construction”. In: New methods of thought and procedure . Springer, 1967, pp. 273–297.
+[40] Gordon D Plotkin. “A structural approach to operationa l semantics”. In:
+(1981).
+[41] David A Schmidt. “Abstract interpretation of small-st ep semantics”. In:
+LOMAPS workshop on Analysis and Veriﬁcation of Multiple-Ag ent Lan-
+guages . Springer. 1996, pp. 76–99.
+[42] Gordon D Plotkin. “The origins of structural operation al semantics”. In:
+The Journal of Logic and Algebraic Programming 60 (2004), pp. 3–15.
+[43] Xavier Leroy and Hervé Grall. “Coinductive big-step op erational seman-
+tics”. In: Information and Computation 207.2 (2009), pp. 284–304.
+[44] Deepti Ghadiyaram, Du Tran, and Dhruv Mahajan. “Large- scale weakly-
+supervised pre-training for video action recognition”. In :Proceedings of
+the IEEE Conference on Computer Vision and Pattern Recognit ion. 2019,
+pp. 12046–12055.
+[45] I Zeki Yalniz et al. “Billion-scale semi-supervised le arning for image clas-
+siﬁcation”. In: arXiv preprint arXiv:1905.00546 (2019).
+[46] John McCarthy. “Recursive functions of symbolic expre ssions and their
+computation by machine”. In: (1959).
+[47] John C Reynolds. “Deﬁnitional interpreters for higher -order programming
+languages”. In: Proceedings of the ACM annual conference-Volume 2 . ACM. 1972, pp. 717–740.
+[48] James R Bell. “Threaded code”. In: Communications of the ACM 16.6
+(1973), pp. 370–372.
+[49] John Tromp. “Binary lambda calculus and combinatory lo gic”. In: Ran-
+domness and Complexity, from Leibniz to Chaitin . World Scientiﬁc, 2007,
+pp. 237–260.
+[50] Katarzyna Grygiel and Pierre Lescanne. “Counting and g enerating terms
+in the binary lambda calculus”. In: Journal of Functional Programming
+25 (2015).
+[51] Mark Stephenson et al. “Meta optimization: improving c ompiler heuristics
+with machine learning”. In: ACM SIGPLAN Notices . Vol. 38. 5. ACM.
+2003, pp. 77–90.
+[52] Juergen Branke and Jawad Asem Elomari. “Meta-optimiza tion for param-
+eter tuning with a ﬂexible computing budget”. In: Proceedings of the 14th
+annual conference on Genetic and evolutionary computation . ACM. 2012,
+pp. 1245–1252.
+25 [53] Christoph Neumüller et al. “Parameter meta-optimizat ion of metaheuris-
+tic optimization algorithms”. In: International Conference on Computer
+Aided Systems Theory . Springer. 2011, pp. 367–374.
+[54] AP Karpenko and ZO Svianadze. “Meta-optimization base d on self-
+organizing map and genetic algorithm”. In: Optical Memory and Neural
+Networks 20.4 (2011), pp. 279–283.
+[55] Petter Krus and Johan Ölvander. “Performance index and meta-
+optimization of a direct search optimization method”. In: Engineering
+optimization 45.10 (2013), pp. 1167–1185.
+[56] Peter Szor and Peter Ferrie. “Hunting for metamorphic” . In:Virus bulletin
+conference . Prague. 2001.
+[57] Xufang Li, Peter KK Loh, and Freddy Tan. “Mechanisms of p olymorphic
+and metamorphic viruses”. In: 2011 European intelligence and security
+informatics conference . IEEE. 2011, pp. 149–154.
+[58] Ankur Singh Bist. “Detection of metamorphic viruses: A survey”. In: 2014
+International Conference on Advances in Computing, Commun ications
+and Informatics (ICACCI) . IEEE. 2014, pp. 1559–1565.
+[59] Scott Kirkpatrick, C Daniel Gelatt, and Mario P Vecchi. “Optimization
+by simulated annealing”. In: science 220.4598 (1983), pp. 671–680.
+[60] Vladimir Černy. “Thermodynamical approach to the trav eling salesman
+problem: An eﬃcient simulation algorithm”. In: Journal of optimization
+theory and applications 45.1 (1985), pp. 41–51.
+[61] Pablo Moscato and JF Fontanari. “Stochastic versus det erministic update
+in simulated annealing”. In: Physics Letters A 146.4 (1990), pp. 204–208.
+[62] Vincent Granville, Mirko Krivánek, and J-P Rasson. “Si mulated annealing:
+A proof of convergence”. In: IEEE transactions on pattern analysis and
+machine intelligence 16.6 (1994), pp. 652–656.
+[63] Emile Aarts and Jan Korst. “Simulated annealing and Bol tzmann ma-
+chines”. In: (1988).
+[64] Daniel R Greening. “Parallel simulated annealing tech niques”. In: Physica
+D: Nonlinear Phenomena 42.1-3 (1990), pp. 293–306.
+[65] Ellen E Witte, Roger D Chamberlain, and Mark A Franklin. “Parallel sim-
+ulated annealing using speculative computation”. In: IEEE Transactions
+on Parallel & Distributed Systems 4 (1991), pp. 483–494.
+[66] Panos M Pardalos et al. “Parallel search for combinator ial optimization:
+Genetic algorithms, simulated annealing, tabu search and G RASP”. In:
+International Workshop on Parallel Algorithms for Irregul arly Structured
+Problems . Springer. 1995, pp. 317–331.
+[67] D Janaki Ram, TH Sreenivas, and K Ganapathy Subramaniam . “Parallel
+simulated annealing algorithms”. In: Journal of parallel and distributed
+computing 37.2 (1996), pp. 207–212.
+[68] Radomir Mech and Przemyslaw Prusinkiewicz. “Generati ng subdivision
+curves with L-systems on a GPU.” In: SIGGRAPH . Vol. 3. Citeseer. 2003,
+p. 1.
+[69] Markus Lipp, Peter Wonka, and Michael Wimmer. “Paralle l generation of
+multiple L-systems”. In: Computers & Graphics 34.5 (2010), pp. 585–593.
+[70] Jon McCormack. “Interactive evolution of L-system gra mmars for com-
+puter graphics modelling”. In: Complex Systems: from biology to compu-
+tation 2 (1993).
+26 [71] Michel Steuwer et al. “Generating performance portabl e code using rewrite
+rules: from high-level functional expressions to high-per formance OpenCL
+code”. In: ACM SIGPLAN Notices 50.9 (2015), pp. 205–217.
+[72] Michel Steuwer, Toomas Remmelg, and Christophe Dubach . “Matrix mul-
+tiplication beyond auto-tuning: rewrite-based GPU code ge neration”. In:
+Proceedings of the International Conference on Compilers, Architectures
+and Synthesis for Embedded Systems . ACM. 2016, p. 15.
+[73] Andreas Klöckner et al. “PyCUDA and PyOpenCL: A scripti ng-based
+approach to GPU run-time code generation”. In: Parallel Computing 38.3
+(2012), pp. 157–174.
+[74] Jeroen Ketema, Alastair F Donaldson, and Carsten Fuhs. “Automatic ter-
+mination analysis for GPU kernels”. In: Workshop on Termination . 2014,
+pp. 50–55.
+[75] Stevan Harnad. “The symbol grounding problem”. In: Physica D: Nonlin-
+ear Phenomena 42.1-3 (1990), pp. 335–346.
+[76] Kang G Shin and Parameswaran Ramanathan. “Real-time co mputing: A
+new discipline of computer science and engineering”. In: Proceedings of
+the IEEE 82.1 (1994), pp. 6–24.
+[77] Roman Yampolskiy. “Unexplainability and Incomprehen sibility of Artiﬁ-
+cial Intelligence”. In: (2019).
+[78] Grégoire Montavon, Wojciech Samek, and Klaus-Robert M üller. “Meth-
+ods for interpreting and understanding deep neural network s”. In: Digital
+Signal Processing 73 (2018), pp. 1–15.
+[79] Hervé Zwirn and Jean-Paul Delahaye. “Unpredictabilit y and computa-
+tional irreducibility”. In: Irreducibility and Computational Equivalence . Springer, 2013, pp. 273–295.
+[80] Roman V Yampolskiy. “Unpredictability of AI”. In: arXiv preprint
+arXiv:1905.13053 (2019).
+[81] Robert W Floyd. “Nondeterministic algorithms”. In: Journal of the ACM
+(JACM) 14.4 (1967), pp. 636–644.
+27

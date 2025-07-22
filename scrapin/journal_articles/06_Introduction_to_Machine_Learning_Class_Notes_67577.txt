@@ -1,0 +1,3765 @@
+================================================================================
+JOURNAL ARTICLE #6
+================================================================================
+
+Title: Introduction to Machine Learning: Class Notes 67577
+Authors: Amnon Shashua
+Published: 2009-04-23
+Source: http://arxiv.org/pdf/0904.3664v1
+
+--------------------------------------------------------------------------------
+ABSTRACT/SUMMARY:
+--------------------------------------------------------------------------------
+Introduction to Machine learning covering Statistical Inference (Bayes, EM,
+ML/MaxEnt duality), algebraic and spectral methods (PCA, LDA, CCA, Clustering),
+and PAC learning (the Formal model, VC dimension, Double Sampling theorem).
+
+--------------------------------------------------------------------------------
+FULL TEXT CONTENT:
+--------------------------------------------------------------------------------
+Introduction to Machine Learning
+67577 - Fall, 2008
+Amnon Shashua
+School of Computer Science and Engineering
+The Hebrew University of Jerusalem
+Jerusalem, IsraelarXiv:0904.3664v1 [cs. LG] 23 Apr 2009 Contents
+1 Bayesian Decision Theory page 1
+1.1 Independence Constraints 5
+1.1.1 Example: Coin Toss 7
+1.1.2 Example: Gaussian Density Estimation 7
+1.2 Incremental Bayes Classi er 9
+1.3 Bayes Classi er for 2-class Normal Distributions 10
+2 Maximum Likelihood/ Maximum Entropy Duality 12
+2.1 ML and Empirical Distribution 12
+2.2 Relative Entropy 14
+2.3 Maximum Entropy and Duality ML/MaxEnt 15
+3 EM Algorithm: ML over Mixture of Distributions 19
+3.1 The EM Algorithm: General 21
+3.2 EM with i.i.d. Data 24
+3.3 Back to the Coins Example 24
+3.4 Gaussian Mixture 26
+3.5 Application Examples 27
+3.5.1 Gaussian Mixture and Clustering 27
+3.5.2 Multinomial Mixture and "bag of words" Application 27
+4 Support Vector Machines and Kernel Functions 30
+4.1 Large Margin Classi er as a Quadratic Linear Programming 31
+4.2 The Support Vector Machine 34
+4.3 The Kernel Trick 36
+4.3.1 The Homogeneous Polynomial Kernel 37
+4.3.2 The non-homogeneous Polynomial Kernel 38
+4.3.3 The RBF Kernel 39
+4.3.4 Classifying New Instances 39
+iii iv Contents
+5 Spectral Analysis I: PCA, LDA, CCA 41
+5.1 PCA: Statistical Perspective 42
+5.1.1 Maximizing the Variance of Output Coordinates 43
+5.1.2 Decorrelation: Diagonalization of the Covariance
+Matrix 46
+5.2 PCA: Optimal Reconstruction 47
+5.3 The Case n>>m 49
+5.4 Kernel PCA 49
+5.5 Fisher's LDA: Basic Idea 50
+5.6 Fisher's LDA: General Derivation 52
+5.7 Fisher's LDA: 2-class 54
+5.8 LDA versus SVM 54
+5.9 Canonical Correlation Analysis 55
+6 Spectral Analysis II: Clustering 58
+6.1 K-means Algorithm for Clustering 59
+6.1.1 Matrix Formulation of K-means 60
+6.2 Min-Cut 62
+6.3 Spectral Clustering: Ratio-Cuts and Normalized-Cuts 63
+6.3.1 Ratio-Cuts 64
+6.3.2 Normalized-Cuts 65
+7 The Formal (PAC) Learning Model 69
+7.1 The Formal Model 69
+7.2 The Rectangle Learning Problem 73
+7.3 Learnability of Finite Concept Classes 75
+7.3.1 The Realizable Case 76
+7.3.2 The Unrealizable Case 77
+8 The VC Dimension 80
+8.1 The VC Dimension 81
+8.2 The Relation between VC dimension and PAC Learning 85
+9 The Double-Sampling Theorem 89
+9.1 A Polynomial Bound on the Sample Size mfor PAC
+Learning 89
+9.2 Optimality of SVM Revisited 95
+10 Appendix 97
+Bibliography 105 1
+Bayesian Decision Theory
+During the next few lectures we will be looking at the inference from training
+data problem as a random process modeled by the joint probability distribu-
+tion over input (measurements) and output (say class labels) variables. In
+general, estimating the underlying distribution is a daunting and unwieldy
+task, but there are a number of constraints or "tricks of the trade" so to
+speak that under certain conditions make this task manageable and fairly
+e ective. To make things simple, we will assume a discrete world, i.e., that the
+values of our random variables take on a  nite number of values. Consider
+for example two random variables Xtaking onkpossible values x1;:::;xk
+andHtaking on two values h1;h2. The values of Xcould stand for a Body
+Mass Index (BMI) measurement weight=height2of a person and Hstands
+for the two possibilities h1standing for the "person being over-weight" and
+h2as the possibility "person of normal weight". Given a BMI measurement
+we would like to estimate the probability of the person being over-weight. The joint probability P(X;H ) is a two dimensional array (2-way array)
+with 2kentries (cells). Each training example ( xi;hj) falls into one of those
+cells, therefore P(X=xi;H=hj) =P(xi;hj) holds the ratio between the
+number of hits into cell ( i;j) and the total number of training examples
+(assuming the training data arrive i.i.d.). As a resultP
+ijP(xi;hj) = 1. The projections of the array onto its vertical and horizontal axes by sum-
+ming over columns or over rows is called marginalization and produces
+P(hj) =P
+iP(xi;hj) the sum over the j'th row is the probability P(H=hj),
+i.e., the probability of a person being over-weight (or not) before we see any
+measurement | these are called priors . Likewise, P(xi) =P
+jP(xi;hj)
+is the probability P(X=xi) which is the probability of receiving such
+a BMI measurement to begin with | this is often called evidence . Note
+1 2 Bayesian Decision Theory
+h12 5 4 2 1
+h20 0 3 3 2
+x1x2x3x4x5
+Fig. 1.1. Joint probability P(X;H ) whereXranges over 5 discrete values and H
+over two values. Each entry contains the number of hits for the cell ( xi;hj). The
+joint probability P(xi;hj) is the number of hits divided by the total number of hits
+(22). See text for more details.
+that, by de nition,P
+jP(hj) =P
+iP(xi) = 1. In Fig. 1.1 we have that
+P(h1) = 14=22;P(h2) = 8=22 that is there is a higher prior probability of a
+person being over-weight than being of normal weight. Also P(x3) = 7=22
+is the highest meaning that we encounter BMI = x3with the highest prob-
+ability. The conditional probability P(hjjxi) =P(xi;hj)=P(xi) is the ratio be-
+tween the number of hits in cell ( i;j) and the number of hits in the i'th
+column, i.e., the probability that the outcome is H=hjgiven the measure-
+mentX=xi. In Fig. 1.1 we have P(h2jx3) = 3=7. Note that
+X
+jP(hjjxi) =X
+jP(xi;hj)
+P(xi)=1
+P(xi)X
+jP(xi;hj) =P(xi)=P(xi) = 1:
+Likewise, the conditional probability P(xijhj) =P(xi;hj)=P(hj) is the
+number of hits in cell ( i;j) normalized by the number of hits in the j'th row
+and represents the probability of receiving BMI = xigiven the class label
+H=hj(over-weight or not) of the person. In Fig. 1.1 we have P(x3jh2) =
+3=8 which is the probability of receiving BMI = x3given that the person is
+known to be of normal weight. Note thatP
+iP(xijhj) = 1. The Bayes formula arises from:
+P(xijhj)P(hj) =P(xi;hj) =P(hjjxi)P(xi);
+from which we get:
+P(hjjxi) =P(xijhj)P(hj)
+P(xi):
+The left hand side P(hjjxi) is called the posterior probability and P(xijhj)
+is called the class conditional likelihood . The Bayes formula provides a
+way to estimate the posterior probability from the prior, evidence and class
+likelihood. It is useful in cases where it is natural to compute (or collect
+data of) the class likelihood, yet it is not quite simple to compute directly Bayesian Decision Theory 3
+the posterior. For example, given a measurement "12" we would like to
+estimate the probability that the measurement came from tossing a pair
+of dice or from spinning a roulette table. If x= 12 is our measurement,
+andh1stands for "pair of dice" and h2for "roulette" then it is natural
+to compute the class conditional: P("12"j"pair of dice ") = 1=36 and
+P("12"j"roulette ") = 1=38. Computing the posterior directly is much
+more dicult. As another example, consider medical diagnosis. Once it is
+known that a patient su ers from some disease hj, it is natural to evaluate
+the probabilities P(xijhj) of the emerging symptoms xi. As a result, in
+many inference problems it is natural to use the class conditionals as the
+basic building blocks and use the Bayes formula to invert those to obtain
+the posteriors. The Bayes rule can often lead to unintuitive results | the one in particu-
+lar is known as "base rate fallacy" which shows how an nonuniform prior can
+in uence the mapping from likelihoods to posteriors. On an intuitive basis,
+people tend to ignore priors and equate likelihoods to posteriors. The follow-
+ing example is typical: consider the "Cancer test kit" problem ywhich has the
+following features: given that the subject has Cancer "C", the probability
+of the test kit producing a positive decision "+" is P(+jC) = 0:98 (which
+means that P(jC) = 0:02) and the probability of the kit producing a neg-
+ative decision "-" given that the subject is healthy "H" is P(jH) = 0:97
+(which means also that P(+jH) = 0:03). The prior probability of Cancer
+in the population is P(C) = 0:01. These numbers appear at  rst glance
+as quite reasonable, i.e, there is a probability of 98% that the test kit will
+produce the correct indication given that the subject has Cancer. What
+we are actually interested in is the probability that the subject has Cancer
+given that the test kit generated a positive decision, i.e., P(Cj+). Using
+Bayes rule:
+P(Cj+) =P(+jC)P(C)
+P(+)=P(+jC)P(C)
+P(+jC)P(C) +P(+jH)P(H)= 0:266
+which means that there is a 26 :6% chance that the subject has Cancer given
+that the test kit produced a positive response | by all means a very poor
+performance. If we draw the posteriors P(h1jx) andP(h2jx) using the probability
+distribution array in Fig. 1.1 we will see that P(h1jx)> P(h2jx) for all
+values ofXsmaller than a value which is in between x3andx4. Therefore
+the decision which will minimize the probability of misclassi cation would
+yThis example is adopted from Yishai Mansour's class notes on Machine Learning. 4 Bayesian Decision Theory
+be to choose the class with the maximal posterior:
+h= argmax
+jP(hjjx);
+which is known as the Maximal A Posteriori (MAP) decision principle. Since
+P(x) is simply a normalization factor, the MAP principle is equivalent to:
+h= argmax
+jP(xjhj)P(hj):
+In the case where information about the prior P(h) is not known or it is
+known that the prior is uniform, the we obtain the Maximum Likelihood
+(ML) principle:
+h= argmax
+jP(xjhj):
+The MAP principle is a particular case of a more general principle, known
+as "proper Bayes", where a lossis incorporated into the decision process. Letl(hi;hj) be the loss incurred by deciding on class hiwhen in fact hjis
+the correct class. For example, the "0/1" loss function is:
+l(hi;hj) =1i6=j
+0i=j
+The least-squares loss function is: l(hi;hj) =khihjk2typically used when
+the outcomes are vectors in some high dimensional space rather than class
+labels. We de ne the expected risk :
+R(hijx) =X
+jl(hi;hj)P(hjjx):
+The proper Bayes decision policy is to minimize the expected risk:
+h= argmin
+jR(hjjx):
+The MAP policy arises in the case l(hi;hj) is the 0/1 loss function:
+R(hijx) =X
+j6=iP(hjjx) = 1P(hijx);
+Thus,
+argmin
+jR(hjjx) = argmax
+jP(hjjx): 1.1 Independence Constraints 5
+1.1 Independence Constraints
+At this point we may pause and ask what have we obtained? well, not
+much. Clearly, the inference problem is captured by the joint probability
+distribution and we do not need all these formulas to see this. How do
+we obtain the necessary data to  ll in the probability distribution array to
+begin with? Clearly without additional simplifying constraints the task is
+not practical as the size of these kind of arrays are exponential in the number
+of variables. There are three families of simplifying constraints used in the
+literature:
+statistical independence constraints,
+parametric form of the class likelihood P(xijhj) where the inference
+becomes a density estimation problem,
+structural assumptions | latent (hidden) variables, graphical models. Today we will focus on the  rst of these simplifying constraints | statistical
+independence properties. Consider two random variables XandY. The variables are statistically
+independent X? YifP(XjY) =P(X) meaning that information about
+the value of Ydoes not add anything about X. The independence condition
+is equivalent to the constraint: P(X;Y ) =P(X)P(Y). This can be easily
+proven: ifX? YthenP(X;Y ) =P(XjY)P(Y) =P(X)P(Y). On the
+other hand, if P(X;Y ) =P(X)P(Y) then
+P(XjY) =P(X;Y )
+P(Y)=P(X)P(Y)
+P(Y)=P(X):
+Let the values of Xrange over x1;:::;xkand the values of Yrange over
+y1;:::;yl. The associated kl2-way array, P(X=xi;Y=yj) is repre-
+sented by the outer product P(xi;yj) =P(xi)P(yj) of two vectors P(X) =
+(P(x1);:::;P (xk)) andP(Y) = (P(y1);:::;P (yl)). In other words, the 2-way
+array viewed as a matrix is of rank 1 and is determined by k+l(minus 2
+because the sum of each vector is 1) parameters rather than kl(minus 1)
+parameters. Likewise, if X1? X2?::::? Xnarenstatistically independent random vari-
+ables where Xiranges over kidiscrete and distinct values, then the n-way
+arrayP(X1;:::;Xn) =P(X1):::P(Xn) is an outer-product of nvectors
+and is therefore determined by k1+:::+kn(minus n) parameters instead
+ofk1k2:::kn(minus 1) parameters y. Viewed as a tensor, the joint probabil-
+yI am a bit over simplifying things because we are ignoring here the fact that the entries of
+the array should be non-negative. This means that there are additional non-linear constraints
+which e ectively reduce the number of parameters | but nevertheless it stays exponential. 6 Bayesian Decision Theory
+ity is a rank 1 tensor. The main point is that the statistical independence
+assumption reduced the representation of the multivariate joint distribution
+from exponential to linear size . Since our variables are typically divided to measurement variables and
+an output/class variable H(or in general H1;:::;Hl), it is useful to intro-
+duce another, weaker form, of independence known as conditional indepen-
+dence . Variables X;Y are conditionally independent given H, denoted by
+X? YjH, i P(XjY;H) =P(XjH) meaning that given H, the value of Y
+does not add any information about X. This is equivalent to the condition
+P(X;YjH) =P(XjH)P(YjH). The proof goes as follows:
+IfP(XjY;H) =P(XjH), then
+P(X;YjH) =P(X;Y;H )
+P(H)=P(XjY;H)P(Y;H)
+P(H)
+=P(XjY;H)P(YjH)P(H)
+P(H)=P(XjH)P(YjH)
+IfP(X;YjH) =P(XjH)P(YjH), then
+P(XjY;H) =P(X;Y;H )
+P(Y;H)=P(X;YjH)
+P(YjH)=P(XjH):
+Consider as an example, Joe and Mo live on opposite sides of the city. Joe goes to work by train and Mo by car. Let Xbe the event "Joe is late
+to work" and Ybe the event "Mo is late for work". Clearly XandYare
+not independent because there could be other factors. For example, a train
+strike will cause Joe to be late, but because of the strike there would be
+extra trac (people using their car instead of the train) thus causing Mo to
+be pate as well. Therefore, a third variable Hstanding for the event "train
+strike" would decouple XandY. From a computational standpoint, the conditional independence assump-
+tion has a similar e ect to the unconditional independence. Let Xrange
+overkdistinct value, Yrange over rdistinct values and Hrange over s
+distinct values. Then P(X;Y;H ) is a 3-way array of size krs. Given
+thatX? YjHmeans that P(X;YjH=hi), a 2-way "slice" of the 3-way
+array along the H axis is represented by the outer-product of two vectors
+P(XjH=hi)P(YjH=hi). As a result the 3-way array is represented by
+s(k+r2) parameters instead of skr1. Likewise, if X1?::::? XnjHthen
+the n-way array P(X1;:::;XnjH=hi) (which is a slice along the H axis of
+the (n+ 1)-arrayP(X1;:::;Xn;H)) is represented by an outer-product of n
+vectors, i.e., by k1+::+knnparameters. 1.1 Independence Constraints 7
+1.1.1 Example: Coin Toss
+We will use the ML principle to estimate the bias of a coin. Let Xbe a
+random variable taking the value f0;1gandHwould be our hypothesis
+taking a real value in [0 ;1] standing for the coin's bias. If the coin's bias is
+qthenP(X= 0jH=q) =qandP(X= 1jH=q) = 1q. We receive m
+i.i.d. examples x1;:::;xmwherexi2f0;1g. We wish to determine the value
+ofq. Given that x1?:::?xmjH, the ML problem we must solve is:
+q= argmax
+qP(x1;:::;xmjH=q) =mY
+i=1P(xijq) = argmax
+qX
+ilogP(xijq):
+Let 0mstand for the number of '0' instances, i.e., =jfxi= 0ji=
+1;:::;mgj. Therefore our ML problem becomes:
+q= argmax
+qflogq+ (n) log(1q)g
+Taking the partial derivative with respect to qand setting it to zero:
+@
+@q[logq+ (n) log(1q)] =
+qn
+1q= 0;
+produces the result:
+q=
+n:
+1.1.2 Example: Gaussian Density Estimation
+So far we considered constraints induced by conditional independent state-
+ments among the random variables as a means to reduce the space and time
+complexity of the multivariate distribution array. Another approach would
+be to assume some form of parametric form governing the entries of the array
+| the most popular assumption is Gaussian distribution P(X1;:::;Xn)
+N(;E) with mean vector and covariance matrix E. The parameters of
+the density function are denoted by = (;E) and for every vector x2Rn
+we have:
+P(xj) =1
+(2)n=2jEj1=2exp1
+2(x)>E1(x):
+Assume we are given an i.i.d sample of kpointsS=fx1;:::;xkg,xi2Rn,
+and we would like to  nd the Bayes optimal :
+= argmax
+P(Sj); 8 Bayesian Decision Theory
+by maximizing the likelihood (here we are assuming that the the priors P()
+are equal, thus the maximum likelihood and the MAP would produce the
+same result). Because the sample was drawn i.i.d. we can assume that:
+P(Sj) =kY
+i=1P(xij):
+LetL() = logP(Sj) =P
+ilogP(xij) and since Log is monotonously
+increasing we have that = argmax
+L(). The parameter estimation would
+be recovered by taking derivatives with respect to , i.e.,rL= 0. We have:
+L() =1
+2logjEjkX
+i=1n
+2log(2)X
+i1
+2(xi)>E1(xi):(1.1)
+We will start with a simple scenario where E=2I, i.e., all the covariances
+are zero and all the variances are equal to 2. Thus,E1=2Iand
+jEj=2n. After substitution (and removal of items which do not depend
+on) we have:
+L() =nklog1
+2X
+ikxik2
+2:
+The partial derivative with respect to :
+@L
+@=2X
+i(xi) = 0
+from which we obtain:
+=1
+kkX
+i=1xi:
+The partial derivative with respect to is:
+@L
+@=nk
+3X
+ikxik2= 0;
+from which we obtain:
+2=1
+knkX
+i=1kxik2:
+Note that the reason for dividing by nis due to the fact that 2
+1=:::=
+2
+n=2, so that:
+1
+kkX
+i=1kxik2=nX
+j=12
+j=n2: 1.2 Incremental Bayes Classi er 9
+In the general case, Eis a full rank symmetric matrix, then the derivative
+of eqn. (1.1) with respect to is:
+@L
+@=E1X
+i(xi) = 0;
+and sinceE1is full rank we obtain = (1=k)P
+ixi. For the derivative
+with respect to Ewe note two auxiliary items:
+@jEj
+@E=jEjE1;@
+@Etrace (AE1) =(E1AE1)>:
+Using the fact that x>y=trace (xy>) we can transform z>E1ztotrace (zz>E1)
+for any vector z. Given that E1is symmetric, then:
+@
+@Etrace (zz>E1) =E1zz>E1:
+Substituting z=xwe obtain:
+@L
+@E=kE1+E1 X
+i(xi)(xi)>! E1= 0;
+from which we obtain:
+E=1
+kkX
+i=1(xi)(xi)>:
+1.2 Incremental Bayes Classi er
+Consider another application of conditional dependence which is the Bayes
+incremental rule. Suppose we have processed nexamplesX(n)=fX1;:::;Xng
+and computed somehow P(HjX(n)). We are given a new measurement X
+and wish to compute (update) the posterior P(HjX(n);X). We will use
+the chain ruley:
+P(XjY;Z) =P(X;Y;Z )
+P(Y;Z) =P(ZjX;Y )P(XjY)P(Y)
+P(ZjY)P(Y)=P(ZjX;Y )P(XjY)
+P(ZjY)
+to obtain:
+P(HjX(n);X) =P(XjX(n);H)P(HjX(n))
+P(XjX(n))
+from conditional independence, P(XjX(n);H) =P(XjH). The term
+P(XjX(n)) can expanded as follows:
+ythis is based on the rule P(X1;:::;Xn) =P(X1jX2;:::;Xn)P(X2jX3;:::;Xn)
+P(Xn1jXn)P(Xn) 10 Bayesian Decision Theory
+P(XjX(n)) =X
+iP(X;X(n)jH=hi)P(H=hi)
+P(X(n))
+=X
+iP(XjH=hi)P(X(n)jH=hi)P(H=hi)
+P(X(n))
+=X
+iP(XjH=hi)P(H=hijX(n))
+After substitution we obtain:
+P(H=hijX(n);X) =P(XjH=hi)P(H=hijX(n))P
+jP(XjH=hj)P(H=hjjX(n)):
+The old posterior P(HjX(n)) is now the prior for the updated formula. Consider the following example y: We have a coin which could be either fair
+or biased towards Head at a probability of 0 :6. LetH=h1be the event
+that the coin is fair, and H=h2that the coin is biased. We start with prior
+probabilities P(h1) = 0:75 andP(h2) = 0:25 (we have a higher initial belief
+that the coin is fair). Suppose our  rst coin toss is a Head, i.e., X1= "0". Then,
+P(h1jx1) =P(x1jh1)P(h1)
+P(x1)=0:50:75
+0:50:75 + 0:60:25= 0:714
+andP(h2jx1) = 0:286. Our posterior belief that the coin is fair has gone
+down after a Head toss. Assume we have another measurement X2= "0",
+then:
+P(h1jx1;x2) =P(x2jh1)P(h1jx1)
+normalization=0:50:714
+0:50:714 + 0:60:286= 0:675;
+andP(h2jx1;x2) = 0:325, thus our belief that the coin is fair continues to
+go down after Head tosses.
+1.3 Bayes Classi er for 2-class Normal Distributions
+For the last topic in this lecture consider the 2-class inference problem. We
+will encountered this problem in this course in the context of SVM and
+LDA. In the Bayes framework, if H=fh1;h2gdenotes the "class member"
+variable with two possible outcomes, then the MAP decision policy calls for
+yadopted from Ron Rivest's 1994 class notes. 1.3 Bayes Classi er for 2-class Normal Distributions 11
+making the decision based on data x:
+h= argmax
+h1;h2fP(h1jx);P(h2jx)g;
+or in other words the class h1would be chosen if P(h1jx)> P(h2jx). The decision surface (as a function of x) is therefore described by:
+P(h1jx)P(h2jx) = 0:
+The questions we ask here is what would the Bayes optimal decision sur-
+face be like if we assume that the two classes are normally distributed with
+di erent means and the same covariance matrix? What we will see is that
+under the condition of equal priors P(h1) =P(h2) the decision surface is
+a hyperplane | and not only that, it is the same hyperplane produced by
+LDA. Claim 1 IfP(h1) =P(h2)andP(xjh1)N(1;E)andP(xjh1)
+N(2;E), the the Bayes optimal decision surface is a hyperplane w>(x
+) = 0 where= (1+2)=2andw=E1(12). In other words, the
+decision surface is described by:
+x>E1(12)1
+2(1+2)E1(12) = 0: (1.2)
+Proof: The decision surface is described by P(h1jx)P(h2jx) = 0
+which is equivalent to the statement that the ratio of the posteriors is 1, or
+equivalently that the log of the ratio is zero, and using Bayes formula we
+obtain:
+0 = logP(xjh1)P(h1)
+P(xjh2)P(h2)= logP(xjh1)
+P(xjh2):
+In other words, the decision surface is described by
+logP(xjh1)logP(xjh2) =1
+2(x1)>E1(x1)+1
+2(x2)>E1(x2) = 0:
+After expanding the two terms we obtain eqn. (1.2). 2
+Maximum Likelihood/ Maximum Entropy Duality
+In the previous lecture we de ned the principle of Maximum Likelihood
+(ML): suppose we have random variables X1;:::;Xnform a random sample
+from a discrete distribution whose joint probability distribution is P(xj)
+where x= (x1;:::;xn) is a vector in the sample and is a parameter from
+some parameter space (which could be a discrete set of values | say class
+membership). When P(xj) is considered as a function of it is called the
+likelihood function . The ML principle is to select the value of that maxi-
+mizes the likelihood function over the observations (training set) x1;:::;xm. If the observations are sampled i.i.d. (a common, not always valid, assump-
+tion), then the ML principle is to maximize:
+= argmax
+mY
+i=1P(xij) = argmax logmY
+i=1P(xij) = argmaxmX
+i=1logP(xij)
+which due to the product nature of the problem it becomes more convenient
+to maximize the log likelihood. We will take a closer look today at the
+ML principle by introducing a key element known as the relative entropy
+measure between distributions.
+2.1 ML and Empirical Distribution
+The ML principle states that the empirical distribution of an i.i.d. sequence
+of examples is the closest possible (in terms of relative entropy which would
+be de ned later) to the true distribution. To make this statement clear
+letXbe a set of symbols fa1;:::;angand letP(aj) be the probability
+(belonging to a parametric family with parameter ) of drawing a symbol
+a2X. Letx1;:::;xmbe a sequence of symbols drawn i.i.d. according to P. The occurrence frequency f(a) measures the number of draws of the symbol
+12 2.1 ML and Empirical Distribution 13
+a:
+f(a) =jfi:xi=agj;
+and let the empirical distribution be de ned by
+^P(a) =1P
+ 2Xf( )f(a) =1
+kfk1f(a) = (1=m)f(a):
+The joint probability P(x1;:::;xmj) is equal to the productQ
+iP(xij)
+which according to the de nitions above is equal to:
+P(x1;:::;xmj) =mY
+i=1p(xij) =Y
+a2XP(aj)f(a):
+The ML principle is therefore equivalent to the optimization problem:
+max
+P2QY
+a2XP(aj)f(a)(2.1)
+whereQ=fq2Rn:q0;P
+iqi= 1gdenote the set of n-dimensional
+probability vectors ("probability simplex"). Let pistand forP(aij) and
+fistand forf(ai). Since argmaxxz(x) = argmaxxlnz(x) and given that
+lnQ
+ipfi
+i=P
+ifilnpithe solution to this problem can be found by setting
+the partial derivative of the Lagrangian to zero:
+L(p;;) =nX
+i=1filnpi(X
+ipi1)X
+iipi;
+whereis the Lagrange multiplier associated with the equality constraintP
+ipi1 = 0 andi0 are the Lagrange multipliers associated with the
+inequality constraints pi0. We also have the complementary slackness
+condition that sets i= 0 ifpi>0. After setting the partial derivative with respect to pito zero we get:
+pi=1
++ifi:
+Assume for now that fi>0 fori= 1;:::;n . Then from complementary
+slackness we must have i= 0 (because pi>0). We are left therefore
+with the result pi= (1=)fi. Following the constraintP
+ip1= 1 we obtain
+=P
+ifi. As a result we obtain: P(aj) =^P(a). In casefi= 0 we could
+use the convention 0 ln 0 = 0 and from continuity arrive to pi= 0. We have arrived to the following theorem:
+Theorem 1 The empirical distribution estimate ^Pis the unique Maximum 14 Maximum Likelihood/ Maximum Entropy Duality
+Likelihood estimate of the probability model Qon the occurrence frequency
+f(). This seems like an obvious result but it actually runs deep because the result
+holds for a very particular (and non-intuitive at  rst glance) distance mea-
+sure between non-negative vectors. Let dist(f;p) be some distance measure
+between the two vectors. The result above states that:
+^P= argmin
+pdist(f;p)s:t:p0;X
+ipi= 1; (2.2)
+for some (family?) of distance measures dist(). It turns out that there
+is only oneysuch distance measure, known as the relative-entropy, which
+satis es the ML result stated above.
+2.2 Relative Entropy
+The relative-entropy (RE) measure D(xjjy) between two non-negative vec-
+torsx;y2Rnis de ned as:
+D(xjjy) =nX
+i=1xilnxi
+yiX
+ixi+X
+iyi:
+In the de nition we use the convention that 0 ln0
+0= 0 and based on con-
+tinuity that 0 ln0
+y= 0 andxlnx
+0=1. When x;yare also probability
+vectors, i.e., belong to Q, thenD(xjjy) =P
+ixilnxi
+yiis also known as the
+Kullback-Leibler divergence. The RE measure is not a distance metric as
+it is not symmetric, D(xjjy)6=D(yjjx), and does not satisfy the triangle
+inequality. Nevertheless, it has several interesting properties which make it
+a fundamental measure in statistical inference. The relative entropy is always non-negative and is zero if and only if
+x=y. This comes about from the log-sum inequality:
+X
+ixilnxi
+yi(X
+ixi) lnP
+ixiP
+iyi
+Thus,
+D(xjjy)(X
+ixi) lnP
+ixiP
+iyiX
+ixi+X
+iyi= xlnx
+yx+ y
+ynot exactly | the picture is a bit more complex. Csiszar's 1972 measures: dist(p;f) =P
+ifi(pi=fi) will satisfy eqn. 2.2 provided that 01is an exponential. However, dist(f;p)
+(parameters positions are switched) will not do it, whereas the relative entropy will satisfy
+eqn. 2.2 regardless of the order of the parameters p;f. 2.3 Maximum Entropy and Duality ML/MaxEnt 15
+Butaln(a=b)abfora;b0 i  ln(a=b)1(b=a) which follows from
+the inequality ln( x+ 1)> x= (x+ 1) (which holds for x >1 andx6= 0). We can state the following theorem:
+Theorem 2 Letf0be the occurrence frequency on a training sample.
+^P2Qis a ML estimate i 
+^P= argmin
+pD(fjjp)s:t:p0;X
+ipi= 1:
+Proof:
+D(fjjp) =X
+ifilnpi+X
+ifilnfiX
+ifi+ 1;
+and
+argmin
+pD(fjjp) = argmax
+pX
+ifilnpi= argmax
+plnY
+ipfi
+i:
+There are two (related) interesting points to make here. First, from the
+proof of Thm. 1 we observe that the non-negativity constraint p0 need
+not be enforced - as long as f0 (which holds by de nition) the closest p
+tofunder the constraintP
+ipi= 1 must come out non-negative . Second,
+the fact that the closest point ptofcomes out as a scaling of f(which is by
+de nition the empirical distribution ^P) arises because of the relative-entropy
+measure. For example, if we had used a least-squares distance measure
+kfpk2the result would not be a scaling of f. In other words, we are
+looking for a projection of the vector fonto the probability simplex, i.e.,
+the intersection of the hyperplane x>1= 1 and the non-negative orthant
+x0. Under relative-entropy the projection is simply a scaling of f(and
+this is why we do not need to enforce non-negativity). Under least-sqaures,
+a projection onto the hyper-plane x>1= 1 could take us out of the non-
+negative orthant (see Fig. 2.1 for illustration). So, relative-entropy is special
+in that regard | it not only provides the ML estimate, but also simpli es
+the optimization process y(something which would be more noticeable when
+we handle a latent class model next lecture).
+2.3 Maximum Entropy and Duality ML/MaxEnt
+The relative-entropy measure is not symmetric thus we expect di erent out-
+comes of the optimization min xD(xjjy) compared to min yD(xjjy). The lat-
+yThe fact that non-negativity "comes for free" does not apply for all class (distribution) models. This point would be re ned in the next lecture. 16 Maximum Likelihood/ Maximum Entropy Duality
+fp^p2
+Fig. 2.1. Projection of a non-neagtaive vector fonto the hyperplaneP
+ixi1 = 0. Under relative-entropy the projection ^Pis a scaling of f(and thus lives in the
+probability simplex). Under least-squares the projection p2lives outside of the
+probability simplex, i.e., could have negative coordinates.
+ter of the two, i.e., min P2QD(P0jjP), whereP0is some empirical evidence
+andQis some model, provides the ML estimation. For example, in the
+next lecture we will consider Qthe set of low-rank joint distributions (called
+latent class model) and see how the ML (via relative-entropy minimization)
+solution can be found. LetH(p) =P
+ipilnpidenote the entropy function. With regard to
+minxD(xjjy) we can state the following observation:
+Claim 2
+argmin
+p2QD(pjj1
+n1) = argmax
+p2QH(p):
+Proof:
+D(pjj1
+n1) =X
+ipilnpi+ (X
+ipi) ln(n) = ln(n)H(p);
+which follows from the conditionP
+ipi= 1. In other words, the closest distribution to uniform is achieved by maxi-
+mizing the entropy. To make this interesting we need to add constraints. Consider a linear constraint on psuch asP
+i ipi= . To be concrete, con- 2.3 Maximum Entropy and Duality ML/MaxEnt 17
+sider a die with six faces thrown many times and we wish to estimate the
+probabilities p1;:::;p 6given only the averageP
+iipi. Say, the average is 3 :5
+which is what one would expect from an unbiased die. The Laplace's prin-
+ciple of insucient reasoning calls for assuming uniformity unless there is
+additional information (a controversial assumption in some cases). In other
+words, if we have no information except that each pi0 and thatP
+ipi= 1
+we should choose the uniform distribution since we have no reason to choose
+any other distribution. Thus, employing Laplace's principle we would say
+that if the average is 3 :5 then the most "likely" distribution is the uniform. What if = 4:2? This kind of problem can be stated as an optimization
+problem:
+maxpH(p)s:t:;X
+ipi= 1;X
+i ipi= ;
+where i=iand = 4:2. We have now two constraints and with the aid
+of Lagrange multipliers we can arrive to the result:
+pi= exp(1)exp i:
+Note that because of the exponential pi0 and again "non-negativity
+comes for free"y. Following the constraintP
+ipi= 1 we get exp(1)=
+1=P
+iexp ifrom which obtain:
+pi=1
+Zexp i;
+whereZ(a function of ) is a normalization factor and needs to be set by
+using (see later). There is nothing special about the uniform distribution,
+thus we could be seeking a probability vector pas close as possible to some
+prior probability p0under the constraints above:
+minpD(pjjp0)s:t:;X
+ipi= 1;X
+i ipi= ;
+with the result:
+pi=1
+Zp0iexp i:
+We could also consider adding more linear constraints on pof the form:P
+ifijpi=bj,j= 1;:::;k . The result would be:
+pi=1
+Zp0iexpPk
+j=1jfij:
+Probability distributions of this form are called Gibbs Distributions . In
+yAny measure of the class dist(p;p0) =P
+ip0i(pi=p0i) minimized under linear constraints
+will satisfy the result of pi0 provided that 01is an exponential. 18 Maximum Likelihood/ Maximum Entropy Duality
+practical applications the linear constraints on pcould arise from average
+information about the system such as temperature of a  uid (where piare
+the probabilities of the particles moving at various velocities), rainfall data
+or general environmental data (where pirepresent the probability of  nding
+animal colonies at discrete locations in a 3D map). A constraint of the
+formP
+ifijpi=bjstates that the expectation Ep[fj] should be equal to
+the empirical distribution  =E^P[fj] where ^Pis either uniform or given as
+input. Let
+P=fp2Rn:p0;X
+ipi= 1; Ep[fj] =E^p[fj];j= 1;:::;kg;
+and
+Q=fq2Rn;qis a Gibbs distribution g
+We could therefore consider looking for the ML solution for the parameters
+1;:::;kof the Gibbs distribution:
+minq2QD(^pjjq);
+where if ^pis uniform then min D(^pjjq) can be replaced by maxP
+ilnqi
+(becauseD((1=n)1jjx) =ln(n)P
+ilnxi). As it turns out, the MaxEnt and ML are duals of each other and the
+intersection of the two sets P\Q contains only a single point which solves
+both problems . Theorem 3 The following are equivalent:
+MaxEnt: q=argmin p2PD(pjjp0)
+ML:q=argmin q2QD(^pjjq)
+q2P\Q
+In practice, the duality theorem is used to recover the parameters of the
+Gibbs distribution using the ML route (second line in the theorem above)
+| the algorithm for doing so is known as the iterative scaling algorithm
+(which we will not get into). 3
+EM Algorithm: ML over Mixture of Distributions
+In Lecture 2 we saw that the Maximum Likelihood (ML) principle over i.i.d.
+data is achieved by minimizing the relative entropy between a model Qand
+the occurrence-frequency of the training data. Speci cally, let x1;::;xmbe
+i.i.d. where each xi2Xdis ad-tupple of symbols taken from an alphabet X
+havingndi erent lettersfa1;:::;ang. Let ^Pbe the empirical joint distribu-
+tion, i.e., an array with ddimensions where each axis has nentries, i.e., each
+entry ^Pi1;:::;id, whereij= 1;:::;n , represents the (normalized) co-occurrence
+of thed-tupeai1;:::;aidin the training set x1;:::;xm. We wish to  nd a
+joint distribution P(also ad-array) which belongs to some model family
+of distributionsQclosest as possible to ^Pin relative-entropy:
+P= argmin
+P2QD(^PjjP):
+In this lecture we will focus on a model of distributions Qwhich represents
+mixtures of simple distributions H| known as latent class models . A latent
+class model arises when the joint probability P(X1;:::;Xd) we observe (i.e.,
+from which ^Pis generated by observing samples x1;:::;xm) is in fact a
+marginal of P(X1;:::;Xd;Y) whereYis a "hidden" (or "latent") random
+variable which has kdi erent discrete values  1;::; k. Then,
+P(X1;:::;Xd) =kX
+j=1P(X1;:::;XdjY= j)P(Y= j):
+The idea is that given the value of the hidden variable Hthe problem of
+recovering the model P(X1;:::;XdjY= j), which belongs to some family
+of joint distributions H, is a relatively simple problem. To make this idea
+clearer we consider the following example: Assume we have two coins. The
+ rst coin has a probability of heads ("0") equal to pand the second coin
+has a probability of heads equal to q. At each trial we choose to toss coin 1
+19 20 EM Algorithm: ML over Mixture of Distributions
+with probability and coin 2 with probability 1 . Once a coin has been
+chosen it is tossed 3 times, producing an observation x2f0;1g3. We are
+given a set of such observations D=fx1;:::;xmgwhere each observation xi
+is a triplet of coin tosses (the same coin). Given D, we can construct the
+empirical distribution ^Pwhich is a 222 array de ned as:
+^Pi1;i2;i3=1
+mjfxi=fi1;i2;i3g; i= 1;:::;mgj:
+Letyi2f1;2gbe a random variable associated with the observation xisuch
+thatyi= 1 if xiwas generated by coin 1 and yi= 2 if xiwas generated
+by coin 2. If we knew the values of yithen our task would be simply
+to estimate two separate Bernoulli distributions by separating the triplets
+generated from coin 1 from those generated by coin 2. Since yiis not known,
+we have the marginal:
+P(x= (x1;x2;x3)) =P(x= (x1;x2;x3)jy= 1)P(y= 1)
++P(x= (x1;x2;x3)jy= 2)P(y= 2)
+=pni(1p)(3ni)+ (1)qni(1q)(3ni);(3.1)
+where (x1;x2;x3)2f0;1g3is a triplet coin toss and 0 ni3 is the
+number of heads ("0") in the triplet of tosses. In other words, the likelihood
+P(x) of triplet of tosses x= (x1;x2;x3) is a linear combination ("mixture")
+of two Bernoulli distributions. Let Hstand for Bernoulli distributions:
+H=fu
+d:u0;nX
+i=1ui= 1g
+where u
+dstands for the outer-product of u2Rnwith itselfdtimes, i.e.,
+an n- way array indexed by i1;:::;id, whereij2f1;:::;ng, and whose value
+there is equal to ui1uid. The model family Qis a mixture of Bernoulli
+distributions:
+Q=fkX
+j=1jPj:0;X
+jj= 1; Pj2Hg;
+where speci cally for our coin-toss example becomes:
+Q=fp
+1p
+3
++ (1)q
+1q
+3
+:;p;q2[0;1]g
+We see therefore that the eight entries of P2Qwhich minimizes D(^PjjP)
+over the setQis determined by three parameters ;p;q . For the coin-toss 3.1 The EM Algorithm: General 21
+example this looks like:
+argmin
+0;p;q1D 
+^Pjjp
+1p
+3
++ (1)q
+1q
+3!
+= argmax
+0;p;q11X
+i1=01X
+i2=01X
+i3=0^Pi1i2i3log
+pni123(1p)(3ni123)+ (1)qni123(1q)(3ni123)
+whereni123=i1+i2+i3. Trying to work out an algorithm for minimizing
+the unknown parameters ;p;q would be somewhat "unpleasant" (and even
+more so for other families of distributions H) because of the log-over-a-sum
+present in the optimization function | if we could somehow turn this into
+a sum-over-log our task would be much easier. We would then be able to
+turn the problem into a succession of problems over Hrather than a single
+problem overQ=P
+jjH. Another point worth attention is the non-
+negativity of the output variables | simply minimizing the relative-entropy
+measure under the constraints of the class model Qwould not guarantee a
+non-negative solution. As we shall see, breaking down the problem into a
+successions of problems over Hwould give us the "non-negativity for free"
+feature. The technique for turning the log-over-sum into a sum-over-log as part of
+ nding the ML solution for a mixture model is known as the Expectation-
+Maximization (EM) algorithm introduced by Dempster, Laird and Rubin in
+1977. It is based on two ideas: (i) introduce auxiliary variables, and (ii) use
+of Jensen's inequality.
+3.1 The EM Algorithm: General
+LetD=fx1;:::;xmgrepresent the training data where xi2Xis taken from
+some instance space Xwhich we leave unspeci ed. For now, we leave matters
+to be as general as possible and speci cally we do not make independence
+assumptions on the data generation process. The ML problem is to  nd a setting of parameters which maximizes
+the likelihood P(x1;:::;xmj), namely, we wish to maximize P(Dj) over
+parameters , which is equivalent to maximizing the log-likelihood:
+= argmax
+logP(Dj) = log0
+@X
+yP(D;yj)1
+A;
+where yrepresents the hidden variables. We will denote L() = logP(Dj). 22 EM Algorithm: ML over Mixture of Distributions
+Letq(yjD;) be some (arbitrary) distribution of the hidden variables ycon-
+ditioned on the parameters and the input sample D, i.e.,P
+yq(yjD;) =
+1. We de ne a lower bound onL() as follows:
+L() = log0
+@X
+yP(D;yj)1
+A (3.2)
+= log0
+@X
+yq(yjD;)P(D;yj)
+q(yjD;)1
+A (3.3)
+X
+yq(yjD;) logP(D;yj)
+q(yjD;)(3.4)
+=Q(q;): (3.5)
+The inequality comes from Jensen's inequality logP
+j jajP
+j jlogaj
+whenP
+j j= 1. What we have obtained is an "auxiliary" function Q(q;)
+satisfying
+L()Q(q;);
+for all distributions q(yjD;). The maximization of Q(q;) proceeds by
+interleaving the variables qandas we separately ascend on each set of
+variables. At the ( t+ 1) iteration we  x the current value of to be(t)
+of thet'th iteration and maximize Q(q;(t)) overq, and then maximize
+Q(q(t+1);) over:
+q(t+1)= argmax
+qQ(q;(t)) (3.6)
+(t+1)= argmax
+Q(q(t+1);): (3.7)
+The strategy of the EM algorithm is to maximize the lower bound Q(q;)
+with the hope that if we ascend on the lower bound function we will also
+ascend with respect to L(). The claim below guarantees that an ascend on
+Qwill also generate an ascend on L:
+Claim 3 (Jordan-Bishop) The optimal q(yjD;(t))at each step is
+P(yjD;(t)). Proof: We will show that Q(P(yjD;(t));(t)) =L((t)) which proves the
+claim since L()Q(q;) for allq;, thus the best q-distribution we can 3.1 The EM Algorithm: General 23
+hope to  nd is one that makes the lower-bound meet L() at=(t). Q(P(yjD;(t));(t)) =X
+yP(yjD;(t)) logP(D;yj(t))
+P(yjD;(t))
+=X
+yP(yjD;(t)) logP(yjD;(t))P(Dj(t))
+P(yjD;(t))
+= logP(Dj(t))X
+yP(yjD;(t))
+=L((t))
+The proof provides also the validity for the approach of ascending along
+the lower bound Q(q;) because at the point (t)the two functions coincide,
+i.e., the lower bound function at =(t)is equal to L((t)) therefore if
+we continue and ascend alongQ() we are guaranteed to ascend along L()
+as welly| therefore, convergence is guaranteed. It can also be shown (but
+omitted here) that the point of convergence is a stationary point of L() (was
+shown originally by C. F. Je  Wu in 1983 years after EM was introduced in
+1977) under fairly general conditions. The second step of maximizing over
+then becomes:
+(t+1)= argmax
+X
+yP(yjD;(t)) logP(D;yj): (3.8)
+This de nes the EM algorithm. Often the "Expectation" step is described
+as taking the expectation of:
+EyP(yjD;(t))[logP(D;yj)];
+followed by a Maximization step of  nding that maximizes the expectation
+| hence the term EM for this algorithm. Eqn. 3.8 describes a principle but not an algorithm because in general,
+without making assumptions on the statistical relationship between the data
+points and the hidden variable the problem presented in eqn. 3.8 is unwieldy. We will reduce eqn. 3.8 to something more manageable by making the i.i.d.
+assumption. This is detailed in the following section.
+ythis manner of deriving EM was adapted from Jordan and Bishop's book notes, 2001. 24 EM Algorithm: ML over Mixture of Distributions
+3.2 EM with i.i.d. Data
+The EM optimization presented in eqn. 3.8 can be simpli ed if we assume
+the data points (and the hidden variable values) are i.i.d. P(Dj) =nY
+i=1P(xij); P (D;yj) =nY
+i=1P(xi;yij);
+and
+P(yjD;) =nY
+i=1P(yijxi;):
+For any (yi) we have:
+X
+y (yi)P(yjD;) =X
+y1X
+yn (yi)P(y1jx1;)P(ynjxn;)
+=X
+yi (yi)P(yijxi;)
+this is becauseP
+yjP(yjjxj;) = 1. Substituting the simpli cations above
+into eqn. 3.8 we obtain:
+(t+1)= argmax
+kX
+j=1mX
+i=1P(yi= jjxi;(t)) logP(xi;yi= jj) (3.9)
+whereyi2f 1;:::; kg.
+3.3 Back to the Coins Example
+We will apply the EM scheme to our running example of mixture of Bernoulli
+distributions. We wish to compute
+Q(;(t)) =X
+yP(yjD;(t)) logP(D;yj)
+=nX
+i=12X
+j=1P(yi=jjxi;(t)) logP(xi;yi=jj); 3.3 Back to the Coins Example 25
+and then maximize Q() with respect to p;q; . Q(;0) =nX
+i=1
+P(yi= 1jxi;0) logP(xijyi= 1;)P(yi= 1j)
++nX
+i=1
+P(yi= 2jxi;0) logP(xijyi= 2;)P(yi= 2j)
+=X
+ih
+ilog(pni(1p)(3ni)) + (1i) log((1)qni(1q)(3ni))i
+where0stands for(t)andi=P(yi= 1jxi;0). The values of iare
+known since 0= (o;po;qo) are given from the previous iteration. The
+Bayes formula is used to compute i:
+i=P(yi= 1jxi;0) =P(xijyi= 1;0)P(yi= 1j0)
+P(xij0)
+=opnio(1po)(3ni)
+opnio(1po)(3ni)+ (1o)qnio(1qo)(3ni)
+We wish to compute: max p;q;Q(;0). The partial derivative with respect
+tois:
+@Q
+@=X
+ii1
+X
+i(1i)1
+1= 0;
+from which we obtain the update formula of giveni:
+=1
+knX
+i=1i:
+The partial derivative with respect to pis:
+@Q
+@p=X
+iini
+pX
+ii(3ni)
+1p= 0;
+from which we obtain the update formula:
+p=1P
+iiX
+ini
+3i:
+Likewise the update rule for qis:
+q=1P
+i(1i)X
+ini
+3(1i):
+To conclude, we start with some initial "guess" of the values of p;q; , com-
+pute the values of iand update iteratively the values of p;q; where at the
+end of each iteration the new values of iare computed. 26 EM Algorithm: ML over Mixture of Distributions
+3.4 Gaussian Mixture
+The Gaussian mixture model assumes that P(x) where x2Rdis a linear
+combination of Gaussian distributions
+P(x) =kX
+j=1P(xjy=j)P(y=j)
+where
+P(xjy=j) =1
+(2)d=2d
+jexpkxcjk2
+22
+j;
+is Normally distributed with mean cjand covariance matrix 2
+jI. LetD=
+fx1;:::;xmgbe the i.i.d sample data and we wish to solve for the mean
+and covariances of the individual Gaussians (the "factors") and the mixing
+coecients j=P(y=j). In order to make clear where the parameters are
+located we will write P(xjj) instead of P(xjy=j) wherej= (cj;2
+j)
+are the mean and variance of the j'th factor. We denote by the collection
+of mixing coecients jandj,j= 1;:::;k . Letwj
+ibe auxiliary variables
+per pointxiand per factor y=jstanding for:
+wj
+i=P(yi=jjxi;):
+The EM step (eqn. 3.9) is:
+(t+1)= argmax
+=f;gkX
+j=1mX
+i=1wj
+i(t)log (jP(xijj)) s:t:X
+jj= 1:(3.10)
+Note the constraintP
+jj= 1. The update formula for wj
+iis done through
+the use of Bayes formula:
+wj
+i(t)=P(yi=jj(t))P(xijyi=j;(t))
+P(xij(t))=1
+Zi(t)
+jP(xij(t));
+whereZiis a scaling factor so thatP
+jwj
+i= 1. The update formula for j;cj;jfollow by taking partial derivatives of
+eqn. (3.10) and setting them to zero. Taking partial derivatives with respect 3.5 Application Examples 27
+toj;cjandjwe obtain the update rules:
+j=1
+mmX
+i=1wj
+i
+cj=1P
+iwj
+imX
+i=1wj
+ixi;
+2
+j=1
+dP
+iwj
+imX
+i=1wj
+ikxicjk2:
+In other words, the observations xiare weighted by wj
+ibefore a Gaussian is
+ tted (ktimes, one for each factor).
+3.5 Application Examples
+3.5.1 Gaussian Mixture and Clustering
+The Gaussian mixture model is classically used for clustering applications. In a clustering application one receives a sample of points x1;:::;xmwhere
+each point resides in Rd. The task of the learner (in this case "unsupervised"
+learning) is to group the mpoints into ksets. Letyi2f1;:::;kgwhere
+i= 1;:::;m stands for the required labeling. The clustering solution is an
+assignment of values to y1;:::;ymaccording to some clustering criteria. In the Gaussian mixture model points are clustered together if they arise
+from the same Gaussian distribution. The EM algorithm provides a proba-
+bilistic assignment P(yi=jjxi) which we denoted above as wj
+i.
+3.5.2 Multinomial Mixture and "bag of words" Application
+The multinomial mixture (the coins example we toyed with) is typically used
+for representing "count" data, such as when representing text documents as
+high-dimensional vectors. A vector representation of a text document asso-
+ciates a word from a  xed vocabulary to a coordinate entry of the vector. The value of the entry represents the number of times that particular word
+appeared in the document. If we ignore the order in which the words ap-
+peared and count only their frequency, a set of documents d1;:::;dmand a
+set of words w1;::::;wncould be jointly represented by a co-occurence nm
+matrixGwhereGijcontains the number of times word wiappeared in doc-
+umentdj. If we scale Gsuch thatP
+ijGij= 1 then we have a distribution
+P(w;d). This kind of representation of a set of documents is called "bag of
+words". 28 EM Algorithm: ML over Mixture of Distributions
+For purposes of search and  ltering it is desired to reveal additional infor-
+mation about words and documents such as to which "topic" a document
+belongs to or to which topics a word is associated with. This is similar to
+a clustering task where documents associated with the same topic are to be
+clustered together. This can be achieved by considering the topics as the
+value of a latent variable y:
+P(w;d) =X
+yP(w;djy)P(y) =X
+yP(wjy)P(djy)P(y);
+where we made the assumption that w?djy(i.e., words and documents are
+conditionally independent given the topic). The conditional independent
+assumption gives rise to the multinomial mixture model. To be more speci c,
+leyy2f1;:::;kgdenote the kpossible topics and let j=P(y=j) (note
+thatP
+jj= 1), then the latent class model becomes:
+P(w;d) =kX
+j=1jP(wjy=j)P(djy=j):
+Note thatP(wjy=j) is a vector which we denote as uj2RnandP(djy=
+j) is also a vector we denote by vj2Rm. The term P(wjy=j)P(djy=j)
+stands for the outer-product ujv>
+jof the two vectors, i.e., is a rank-1 nm
+matrix. The Maximum-Likelihood estimation problem is therefore to  nd
+vectors u1;:::;ukandv1;:::;vkand scalars 1;:::;ksuch that the empirical
+distribution represented by the unit scaled matrix Gis as close as possible
+(in relative-entropy measure) to the low-rank matrixP
+jjujv>
+jsubject to
+the constraints of non-negativity andP
+jj= 1,ujandvjare unit-scaled
+as well ( 1>uj=1>vj= 1). Letxi= (w(i);d(i)) stand for the i'th example i= 1;:::;q where an
+example is a pair of word and document where w(i)2f1;:::;ngis the index
+to the word alphabet and d(i)2f1;:::;mgis the index to the document. The EM algorithm involves the following optimization step:
+(t+1)= argmax
+qX
+i=1kX
+j=1P(yi=jjxi;(t)) logP(xi;yi=jj)
+= argmax
+qX
+i=1kX
+j=1w(t)
+ijlog
+juj;w(i)vj;d(i)
+s:t:1>=1>uj=1>vj= 1
+An update rule for ujr(ther'th entry of uj) is derived below: the derivative 3.5 Application Examples 29
+of the Lagrangian is:
+@
+@ujr"qX
+i=1w(t)
+ijloguj;w(i)ujr#
+=@
+@ujr2
+4N(r) logujrX
+w(i)=rw(t)
+ijujr3
+5
+=N(r)P
+w(i)=rw(t)
+ij
+ujr= 0
+whereN(r) stands for the frequency of the word wrin all the documents
+d1;:::;dm. Note that N(r) is the result of summing-up the r'th row ofGand
+that the vector N(1);:::;N (n) is the marginal P(w) =P
+dP(w;d). Given
+the constraint 1>uj= 1 we obtain the update rule:
+ujr N(r)P
+w(i)=rw(t)
+ijPn
+s=1N(s)P
+w(i)=sw(t)
+ij:
+Update rules for the remaining unknowns are similarly derived. Once EM
+has converged, thenP
+w(i)=rw
+ijis the probability of the word wrto belong
+to thej'th topic andP
+d(i)=sw
+ijis the probability that the s'th document
+comes from the j'th topic. 4
+Support Vector Machines and Kernel Functions
+In this lecture we begin the exploration of the 2-class hyperplane separation
+problem. We are given a training set of instances xi2Rn,i= 1;:::;m ,
+and class labels yi=1 (i.e., the training set is made up of \positive"
+and \negative" examples). We wish to  nd a hyperplane direction w2Rn
+and an o set scalar bsuch that wxib >0 for positive examples and
+wxib < 0 for negative examples | which together means that the
+marginsyi(wxib)>0 are positive. Assuming that such a hyperplane exists, clearly it is not unique. We
+therefore need to introduce another constraint so that we could  nd the
+most \sensible" solution among all (in nitley many) possible hyperplanes
+which separate the training data. Another issue is that the framework is
+very limited in the sense that for most real-world classi cation problems
+it is somewhat unlikely that there would exist a linear separating function
+to begin with. We therefore need to  nd a way to extend the framework
+to include non-linear decision boundaries at a reasonable cost. These two
+issues will be the focus of this lecture. Regarding the  rst issue, since there is more than one separating hyper-
+plane (assuming the training data is linearly separable) then the question
+we need to ask ourselves is among all those solutions which of them has the
+best \generalization" properties? In other words, our goal in constructing
+a learning machine is not necessarily to do very well (or perfect) on the
+training data, because the training data is merely a sample of the instance
+space, and not necessarily a \representative" sample | it is simply a sample. Therefore, doing well on the sample (the training data) does not necessarily
+guarantee (or even imply) that we will do well on the entire instance space. The goal of constructing a learning machine is to maximize the performance
+on the test data (the instances we haven't seen), which in turn means that
+30 4.1 Large Margin Classi er as a Quadratic Linear Programming 31
+we wish to generalize \good" classi cation performance on the training set
+onto the entire instance space. A related issue to generalization is that the distribution used to generate
+the training data is unknown. Unlike the statistical inference material we
+had so far, this time we will not attempt to estimate the distribution. The
+reason one can derive optimal learning algorithms yet bypass the need for
+estimating distributions would be explained later in the course when PAC-
+learning will be introduced. For now we will focus only on the algorithmic
+aspect of the learning problem. The idea is to consider a subset C of all hyperplanes which have a  xed
+margin where the margin is de ned as the distance of the closest training
+point to the hyperplane:
+ = min
+iyi(w>xib)
+kwk
+:
+The Support Vector Machine (SVM),  rst introduced by Vapnik and his
+colleagues in 1992, seeks a separating hyperplane which simultaneously min-
+imizes the empirical error andmaximizes the margin. The idea of maximiz-
+ing the margin is intuitively appealing because a decision boundary which
+lies close to some of the training instances is less likely to generalize well
+because the learning machine will be susceptible to small perturbations of
+those instance vectors. A formal motivation for this approach is deferred to
+the PAC-learning material we will introduce later in the course.
+4.1 Large Margin Classi er as a Quadratic Linear Programming
+We would  rst like to set up the linear separating hyperplane as an optimiza-
+tion problem which is both consistent with the training data and maximizes
+the margin induce by the separating hyperplane over all possible consistent
+hyperplanes. Formally speaking, the distance between a point xand the hyperplane is
+de ned by
+jwxbjpww:
+Since we are allowed to scale the parameters w;bat will (note that if w
+xb >0 so is (w)x(b)>0 for all > 0) we can set the distance
+between the boundary points to the hyperplane to be 1 =pwwby scaling
+w;bsuch the point(s) with smallest margin (closest to the hyperplane) will
+be normalized:jwxbj= 1, therefore the margin is simply 2 =pww(see
+Fig. 5.1). Note that argmax w2=pwwis equivalent to argmax w2=(ww) 32 Support Vector Machines and Kernel Functions
+which in turn is equivalent to argmin w1
+2ww. Since all positive points
+and negative points should be farther away from the boundary points we
+also have the separability constraints wxb1 when xis a positive
+instance and wxb1 when xis a negative instance. Both separability
+constraints can be combined: y(wxb)1. Taken together, we have
+de ned the following optimization problem:
+minw;b1
+2ww (4.1)
+subject to
+yi(wxib)10i= 1;:::;m (4.2)
+This type of optimization problem has a quadratic criteria function and
+linear inequalities and is known in the literature as a Quadratic Linear Pro-
+gramming (QP) type of problem. This particular QP, however, requires that the training data are linearly
+separable | a condition which may be unrealistic. We can relax this condi-
+tion by introducing the concept of a \soft margin" in which the separability
+holds approximately with some error:
+minw;b;i1
+2ww+lX
+i=1i (4.3)
+subject to
+yi(wxib)1ii= 1;:::;m
+i0
+Whereis some pre-de ned weighting factor. The (non-negative) vari-
+ablesiallow data points to be miss-classi ed thereby creating an approx-
+imate separation. Speci cally, if xiis a positive instance ( yi= 1) then the
+\soft" constraint becomes:
+wxib1i;
+where ifi= 0 we are back to the original constraint where xiis either a
+boundary point or laying further away in the half space assigned to positive
+instances. When i>0 the point xican reside inside the margin or even in
+the half space assigned to negative instances. Likewise, if xiis a negative
+instance (yi=1) then the soft constraint becomes:
+wxib1 +i: 4.1 Large Margin Classi er as a Quadratic Linear Programming 33
+),(bwmaximize the margin||2
+w
+0>i!0>iµ0=jµ
+Fig. 4.1. Separating hyperplane w;bwith maximal margin. The boundary points
+are associated with non-vanishing Lagrange multipliers i>0 and margin errors
+are associated with i>0 where the criteria function encourages a small number
+of margin errors. The criterion function penalizes (the L1-norm) for non-vanishing ithus the
+overall system will seek a solution with few as possible \margin errors" (see
+Fig. 5.1). Typically, when possible, an L1norm is preferable as the L2norm
+overly weighs high magnitude outliers which in some cases can dominate
+the energy function. Another note to make here is that strictly speaking
+the "right thing" to do is to penalize the margin errors based on the L0
+normkk0
+0=jfi:i>0gj, i.e., the number of non-zero entries, and drop
+the balancing parameter . This is because it does not matter how far away
+a point is from the hyperplane | all what matters is whether a point is
+classi ed correctly or not (see the de nition of empirical error in Lecture 4). The problem with that is that the optimization problem would no longer be
+convex and non-convex problems are notoriously dicult to solve. Moreover,
+the class of convex optimization problems (as the one described in Eqn. 4.3)
+can be solved in polynomial time complexity. So far we have described the problem formulation which when solved
+would provide a solution with \sensible" generalization properties. Although
+we can proceed using an o -the-shelf QLP solver, we will  rst pursue the
+"dual" problem. The dual form will highlight some key properties of the
+approach and will enable us to extend the framework to handle non-linear 34 Support Vector Machines and Kernel Functions
+decision surfaces at a very little cost. In the appendix we take a brief tour on
+the basic principles associated with constrained optimization, the Karush-
+Kuhn-Tucker (KKT) theorem and the dual form. Those are recommended
+to read before moving to the next section.
+4.2 The Support Vector Machine
+We return now to the primal problem (eqn. 6.3) representing the maximal
+margin separating hyperplane with margin errors:
+minw;b;i1
+2ww+lX
+i=1i
+subject to
+yi(wxib)1ii= 1;:::;m
+i0
+We will now derive the Lagrangian Dual of this problem. By doing so a
+new key property will emerge facilitated by the fact that the criteria func-
+tion() (note there are no equality constraints thus there is no need for )
+involves only inner-products of the training instance vectors xi. This prop-
+erty will form the key of mapping the original input space of dimension nto
+a higher dimensional space thereby allowing for non-linear decision surfaces
+for separating the training data. Note that with this particular problem the strong duality conditions are
+satis ed because the criteria function and the inequality constraints form a
+convex set. The Lagrangian takes the following form:
+L(w;b;i;) =1
+2ww+mX
+i=1imX
+i=1i[yi(wxib)1 +i]mX
+i=1ii
+Recall that
+() = minw;b;L(w;b;;;):
+Since the minimum is obtained at the vanishing partial derivatives of the
+Lagrangian with respect to w;b, the next step would be to evaluate those 4.2 The Support Vector Machine 35
+constraints and substitute them back into L() to obtain ():
+@L
+@w=wX
+iiyixi= 0 (4.4)
+@L
+@b=X
+iiyi= 0 (4.5)
+@L
+@i=ii= 0 (4.6)
+From the  rst constraint (4.4) we obtain w=P
+iiyixi, that is, wis de-
+scribed by a linear combination of a subset of the training instances. The
+reason that not all instances participate in the linear superposition is due
+to the KKT conditions: i= 0 whenyi(wxib)>1, i.e., the instance xi
+is classi ed correctly and is not a boundary point, and conversely, i>0
+whenyi(wxib) = 1i, i.e., when xiis a boundary point or when
+xiis a margin error ( i>0) | note that for a margin error instance the
+value ofiwould be the smallest possible required to reach an equality in
+the constraint because the criteria function penalizes large values of i. The
+boundary points (and the margin errors) are called support vectors thuswis
+de ned by the support vectors only. The third constraint (4.6) is equivalent
+to the constraint:
+0i i = 1;:::;l;
+sincei0. Also note that if i>0, i.e., point xiis a margin-error point,
+then by KKT conditions we must have i= 0. As a result i=. Therefore
+based on the values of ialone we can make the following classi cations:
+0<i<: point xiis on the margin and is not a margin-error.
+i=: points xiis a margin-error point.
+i= 0: point xiis not on the margin. Substituting these results/constraints back into the Lagrangian L() we
+obtain the dual problem :
+max
+1;:::;m() =mX
+i=1i1
+2X
+i;jijyiyjxixj (4.7)
+subject to
+0i i = 1;:::;m
+mX
+i=1yii= 0
+The criterion function () can be written in a more compact manner as 36 Support Vector Machines and Kernel Functions
+follows: Let Mbe allmatrix whose entries are Mij=yiyjxixjthen
+() =>11
+2>Mwhere 1is the vector of (1 ;:::;1) and is the vector
+(1;:::;m) and>is the transpose (row vector). Note that Mispositive
+de nite , i.e., x>Mx>0 for all vectors x6= 0 | a property which will be
+important later. The key feature of the dual problem is not so much that it is simpler
+than the primal (in fact it isn't since the primal has no equality constraints)
+or that it has a more \elegant" feel, the key feature is that the problem
+is completely described by the inner products of the training instances xi,
+i= 1;:::;m . This fact will be shown to be a crucial ingredient in the so called
+\kernel trick" for the computation of inner-products in high dimensional
+spaces using simple functions de ned on pairs of training instances.
+4.3 The Kernel Trick
+We ended with the dual formulation of the SVM problem and noticed that
+the input data vectors xiare represented by the Gram matrix M. In other
+words, only inner-products of the input vectors play a role in the dual for-
+mulation | there is no explicit use of xior any other function of xibesides
+inner-products. This observation suggests the use of what is known as the
+"kernel trick" to replace the inner-products by non-linear functions. The common principle of kernel methods is to construct nonlinear vari-
+ants of linear algorithms by substituting inner-products by nonlinear kernel
+functions. Under certain conditions this process can be interpreted as map-
+ping of the original measurement vectors (so called "input space") onto
+some higher dimensional space (possibly in nitely high) commonly referred
+to as the "feature space". Mathematically, the kernel approach is de ned
+as follows: let x1;:::;xlbe vectors in the input space, say Rn, and con-
+sider a mapping (x) :Rn! F whereFis an inner-product space. The
+kernel-trick is to calculate the inner-product in Fusing a kernel function
+k:RnRn! R,k(xi;xj) =(xi)>(xj), while avoiding explicit mappings
+(evaluation of) (). Common choices of kernel selection include the d'th order polynomial
+kernelsk(xi;xj) = (x>
+ixj+)dand the Gaussian RBF kernels k(xi;xj) =
+exp(1
+22kxixjk2). If an algorithm can be restated such that the input
+vectors appear in terms of inner-products only, one can substitute the inner-
+products by such a kernel function. The resulting kernel algorithm can be
+interpreted as running the original algorithm on the space Fof mapped
+objects(x). We know that Mof the dual form is positive semi-de nite because M 4.3 The Kernel Trick 37
+can be written is M=Q>QwhereQ= [y1x1;:::;ylxl]. Therefore x>Mx=
+kQxk20 for all choices of x(which means that the eigenvalues of Mare
+non-negative). If the entries of Mare to be replaced with yiyjk(xi;xj) then
+the condition we must enforce on the function k() is that it is a positive
+de nite kernel function. A positive de nite function is de ned such that
+for any set of vectors x1;:::;xqand for any values of qthe matrix Kwhose
+entries areKij=k(xi;xj) is positive semi-de nite. Formally, the conditions
+for admissible kernels k() are known as Mercer's conditions summarized
+below:
+Theorem 4 (Mercer's Conditions) Letk(x;y)be symmetric and contin-
+uous. The following conditions are equivalent:
+(i)k(x;y) =P1
+i=1 ii(x)i(y) =(x)>(y)for any uniformly converg-
+ing series i>0.
+(ii)for all ()satisfyingR
+x 2(x)dx<1, then
+Z
+xZ
+yk(x;y) (x) (y)dxdy0
+(iii) for allfxigq
+i=1and for all q, the matrix Kij=k(xi;xj)is positive
+semi-de nite. Perhaps the non-obvious condition is No. 1 which allows for the feature
+map() to have in nitely many coordinates (a vector in Hilbert space). For
+example, as we shall see below, the kernel exp( 1
+22kxixjk2) is an inner-
+product of two vectors with in nitely many coordinates. We will consider
+next a number of popular kernels.
+4.3.1 The Homogeneous Polynomial Kernel
+Letx;y2Rkand de nek(x;y) = (x>y)dwhered>0 is a natural number. Then, the corresponding feature map (x) hask+d1
+d
+=O(kd) coordinates
+which take the value:
+(x) = sd
+n1;:::;nk
+xn1
+1xnk
+k!
+ni0;P
+ini=d
+whered
+n1;:::;nk
+=d!=(n1!nk!) is the multinomial coecient (number of
+ways to distribute dballs intokbins where the j'th bin hold exactly nj0
+balls):
+(x1+:::+xk)d=X
+ni0;P
+ini=dd
+n1;:::;nk
+xn1
+1xnk
+k: 38 Support Vector Machines and Kernel Functions
+The dimension of the vector space (x) where x2Rkcan be measured
+using the following combinatorial problem: how many arrangements of k1
+partitions to be placed among ditems? the answer isk+d1
+k1
+=k+d1
+d
+=
+O(kd). For example, k=d= 2 gives us :
+(x>y)2=x2
+1y2
+1+ 2x1x2y1y2+x2
+2y2
+2=(x)>(y);
+where(x) = (x2
+1;x2
+2;p
+2x1x2).
+4.3.2 The non-homogeneous Polynomial Kernel
+The feature map (x) contains all monomials whose power is lesser or equal
+tod, i.e.,P
+inid. This can be acheived by increasing the dimension
+tok+ 1 where nk+1is used to  ll the gap betweenPk
+i=1ni< d andd. Therefore the dimension of (x) where x2Rkwould bek+d
+d
+. We have:
+(x>y+)d= (x1y1+:::+xkyk+p
+p
+)d
+=X
+ni0;Pk+1
+i=1ni=dd
+n1;:::;nk+1
+xn1
+1yn1
+1xnk
+1ynk
+1nk+1=2nk+1=2
+Therefore, the entries of the vector (x) take the values:
+(x) = sd
+n1;:::;nk+1
+xn1
+1xnk
+knk+1=2!
+ni0;Pk+1
+i=1ni=d
+For example, k=d= 2 gives us :
+(x>y+)2=x2
+1y2
+1+ 2x1x2y1y2+x2
+2y2
+2+ 2x1y1+ 2x2y2+=(x)>(y);
+where(x) = (x2
+1;x2
+2;p
+2x1x2;p
+2x1;p
+2x2;p
+). In this example, () is a
+mapping from R2toR6and hyperplanes (w)>(x)b= 0 inR6correspond
+toconics inR2:
+(w2
+1)x2
+1+ (w2
+2)x2+ (2w1w2)x1x2+ (2w1)x1+ (2w2)x2+ (b) = 0
+Assume we would like to  nd a separating conic (Parabola, Hyperbola,
+Ellipse) function rather than a line in R2. The discussion so far suggests we
+construct the Gram matrix Min the dual form with the d= 2 polynomial
+kernelk(x;y) = (x>y+)2for some parameter of our choosing. The extra
+e ort we will need to invest is negligible | simply replace every occurrence
+x>
+ixjwith ( x>
+ixj+)2. 4.3 The Kernel Trick 39
+4.3.3 The RBF Kernel
+The function k(x;y) =ekxyk2=22known as a Radial Basis Function
+(RBF) is a kernel function but with an in nite expansion. Without loss of
+generality let = 1, then we have:
+ekxyk2=2=ekxk2=2ekyk2=2ex>y
+=1X
+j=0(x>y)j
+j!ekxk2=2ekyk2=2
+=1X
+j=00
+@ekxk2
+2j
+pj!1=jekyk2
+2j
+pj!1=jx>y1
+Aj
+=1X
+j=0X
+P
+ini=jekxk2
+2j
+pj!1=jj
+n1;:::;nk1=2
+xn1
+1xnk
+kekyk2
+2j
+pj!1=jj
+n1;:::;nk1=2
+yn1
+1ynk
+k
+From which we can see that the entries of the feature map (x) are:
+(x) =0
+@ekxk2
+2j
+pj!1=jj
+n1;:::;nk1=2
+xn1
+1xnk
+k1
+A
+j=0;::;1;Pk
+i=1ni=j
+4.3.4 Classifying New Instances
+By adopting some kernel k() we are in fact mapping x!(x), thus we
+then proceed to solve for (w) andbusing some QLP solver. The QLP
+solution of the dual form will yield the solution for the Lagrange multipliers
+1;:::;m. We saw from eqn. (4.4) that we can express (w) as a function
+of the (mapped) examples:
+(w) =X
+iiyi(xi):
+Rather than explicitly representing (w) | a task which may be prohibitly
+expensive since in general the dimension of the feature space of a polynomial
+mapping isk+d
+d
+| we store all the support vectors (those input vectors
+with corresponding i>0) and use them for the evaluation of test examples:
+f(x) =sign((w)>(x)b) =sign(X
+iiyi(xi)>(x)b)
+=sign(X
+iiyik(xi;x)b): 40 Support Vector Machines and Kernel Functions
+We see that the kernel trick enabled us to look for a non-linear separating
+surface by making an implicit mapping of the input space onto a higher di-
+mensional feature space using the same dual form of the SVM formulation |
+the only change required was in the way the Gram matrix was constructed. The price paid for this convenience is to carry allthe support vectors at the
+time of classi cation f(x). A couple of notes may be worthwhile at this point. The constant bcan
+be recovered from any of the support vectors. Say, x+is a positive support
+vector (but not a margin error, i.e., i< ). Then(w)>(x+)b= 1
+from which bcan be recovered. The second note is that the number of
+support vectors is typically around 10% of the number of training examples
+(empirically). Thus the computational load during evaluation of f(x) may
+be relatively high. Approximations have been proposed in the literature by
+looking for a reduced number of support vectors (not necessarily aligned
+with the training set) | but this is beyond the scope of this course. The kernel trick gained its popularity with the introduction of the SVM
+but since then has taken a life of its own and has been applied to principal
+component analysis (PCA), ridge regression, canonical correlation analysis
+(CCA), QR factorization and the list goes on. We will meet again with the
+kernel trick later on. 5
+Spectral Analysis I: PCA, LDA, CCA
+In this lecture (and the following one) we will focus on spectral methods for
+learning. Today we will focus on dimensionality reduction using Principle
+Component Analysis (PCA), multi-class learning using Linear Discriminant
+Analysis (LDA) and Canonical Correlation Analysis (CCA). In the next
+lecture we will focus on spectral clustering methods. Dimensionality reduction appears when the dimension of the input vector
+is very large (imagine pixels in an image, for example) while the coordi-
+nate measurements are highly inter-dependent (again, imagine the redun-
+dancy present among neighboring pixels in an image). High dimensional
+data impose computational eciency challenges and often translate to poor
+generalization abilities of the learning engine (see lectures on PAC). A di-
+mensionality reduction can also be viewed as a feature extraction process
+where one takes as input a large feature set (the original measurements)
+and creates from them a much smaller number of new features which are
+then fed into the learning engine. In this lecture we will focus on feature extraction from a very speci c (and
+constrained) stanpoint. We would be looking for a mixing (linear combina-
+tion) of the input coordinates such that we obtain a linear projection from
+RntoRqfor someq < n . In doing so we wish to reduce the redundancy
+while preserving as much as possible the variance of the data. From a sta-
+tistical standpoint this is achieved by transforming to a new set of variables,
+called principal components, which are uncorrelated so that the  rst few
+retain most of the variation present in all of the original coordinates. For
+example, in an image processing application the input images are highly re-
+dundant where neighboring pixel values are highly correlated. The purpose
+of feature extraction would be to transform the input image into a vector of
+output components with the least redundancy possible. Form a geometric
+standpoint, this is achieved by  nding the "closest" (in least squares sense)
+41 42 Spectral Analysis I: PCA, LDA, CCA
+linearq-dimensional susbspace to the msample points S. The new sub-
+space is a lower dimensional "best approximation" to the sample S. These
+two, equivalent, perspectives on data compression (dimensionality reduc-
+tion) form the central idea of principal component analysis (PCA) which
+probably the oldest (going back to Pearson 1901) and best known of the
+techniques of multivariate analysis in statistics. The computation of PCA
+is very simple and the de nition is straightforward, but has a wide variety
+of di erent applications, a number of di erent derivations, quite a number
+of di erent terminologies (especially outside the statistical literature) and is
+the basis for quite a number of variations on the basic technique. We then extend the variance preserving approach for data representation
+forlabeled data sets. We will describe the linear classi er approach (sepa-
+rating hyperplane) form the point of view of looking for a hyperplane such
+that when the data is projected onto it the separation is maximized (the dis-
+tance between the class means is maximal) and the data within each class is
+compact (the variance/spread is minimized). The solution is also produced,
+just like PCA, by a spectral analysis of the data. This approach goes under
+the name of Fisher's Linear Discriminant Analysis (LDA). What is common between PCA and LDA is (i) the use of spectral ma-
+trix analysis | i.e., what can you do with eigenvalues and eigenvectors of
+matrices representing subspaces of the data? (ii) these techniques produce
+optimal results for normally distributed data and are very easy to imple-
+ment. There is a large variety of uses of spectral analysis in statistical and
+learning literature including spectral clustering, Multi Dimensional Scaling
+(MDS) and data modeling in general. Another point to note is that this is
+the  rst time in the course where the type of data distribution plays a role
+in the analysis | the two techniques are de ned for any distribution but
+are optimal only under the Gaussian distribution. We will also describe a non-linear extension of PCA known as Kernel-
+PCA, but the focus would be mostly on PCA itself and its analysis from
+a couple of vantage points: (i) PCA as an optimal reconstruction after a
+dimension reduction, i.e., data compression, and (ii) PCA for redundancy
+reduction (decorrelation) of the output components.
+5.1 PCA: Statistical Perspective
+Letx1;:::;xm2Rnbe our sample data Sof vectors in Rn, arranged as
+columns of a matrix A. It will be convenient to assume that the data is
+centered, i.e.,Pxi= 0. If the data is not centered we can always center it
+by computing the mean vector = (1=m)P
+ixiand replace the original data 5.1 PCA: Statistical Perspective 43
+sample with the new sample xi. In a statistical sense, the coordinates
+of the vector x2Rnare considered as random variables, thus a row in the
+matrixAis the sample of values of a particular random variable, drawn from
+some unknown probability distribution, associated with the row position. We wish to  nd vectors u1;:::;uq(arranged as columns of a matrix U),
+whereqmin(n;m), such that the new feature measurements y=U>x
+(who are the result of linear combinations u>
+1x;:::;u>
+qxof the original feature
+measurements x) have certain desirable properties. The idea property to seek from the new coordinates yis statistical inde-
+pendence, i.e., P(y1;::;yq) =P(y1)P(yq) which would mean that we have
+removed the redundancy of the original data xin the best possible manner. This goal, however, is too much to ask from a linear transformation and
+instead we would ask for a weaker property to hold: that the pairwise co-
+variancecov(yi;yj) = 0 vanishes, i.e., that the covariance matrix on the new
+coordinates is diagonal. A diagonal covariance insures some redundancy re-
+moval, but not as good as statistical independence. However, when the data
+is Normally distributed P(x)N(;) with mean and covariance , then
+the transformation which diagonalizes the covariance matrix also guarantees
+statistical independence. Among all transformations that de-correlate the
+data we will seek the one that maximizes the spread (variance) of the sample
+data after being projected onto the new axes vectors.
+5.1.1 Maximizing the Variance of Output Coordinates
+The property we would like to maximize is that the projection of the sample
+data on the new axes is as spread as possible. To start this analysis, assume
+q= 1, i.e., the ncomponents of the input vector xare reduced to a single
+output component y=u>x. We are looking for a single vector u2Rn
+whose direction maximizes the variance of the output component y. Formally, we are looking for a unit vector uwhich maximizesP
+i(u>xi)2
+(see Appendix A for basic statistical de nitions and note that E[y] = 0
+becauseP
+iu>xi=u>
+i(P
+ixi) = 0). In other words, the projected points
+onto the axis represented by the vector uare as spread as possible (in a
+least squares sense). In vector notation, the optimization problem takes the
+following form:
+maxu1
+2ku>Ak2subject to1
+2u>u= 1
+The Lagrangian of the problem is:
+L(u;) =1
+2u>AA>u(1
+2u>u1) 44 Spectral Analysis I: PCA, LDA, CCA
+By taking the partial derivative @L=@u= 0 we obtain the following necessary
+condition (see Appendix B):
+AA>u=u;
+which tells us that uis an eigenvector of the nn(symmetric and positive
+de nite) matrix AA>. There are neigenvectors associated with AA>and
+we can easily convince ourselves that we are looking for the one associated
+with the maximal eigenvalue: substitute uinstead ofAA>uin the criterion
+function u>AA>uto obtain(u>u) =and since the eigenvalues must be
+positive (since AA>is positive de nite), then the optimum is obtained for
+the maximal eigenvalue. The leading eigenvector uofAA>is called the  rst
+principal axis of the data sample represented by the columns of the matrix
+A, andy=u>xis called the  rst principal component of the data sample. For convenience, we denote u1=uand1=as the leading eigenvector
+and eigenvalue of AA>. Next, we look for y2=u>
+2xwhich is uncorrelated
+withy1=u>
+1xand which has maximum variance (and so on for u3;:::;uq). Two random variables are uncorrelated if their covariance vanishes. By
+de nition of covariance (see Appendix A) we obtain:
+Cov(y1y2) =X
+i(u>
+1xi)(u>
+2xi) =u>
+1(X
+ixix>
+i)u2
+=u>
+1AA>u2=u>
+2AA>u1=1u>
+1u2= 0
+We can therefore use the condition u>
+1u2= 0 to specify zero correlation
+betweeny1;y2. The functional to be optimized becomes:
+maxu21
+2ku>
+2Ak2subject to1
+2u>
+2u2= 1;u>
+1u2= 0;
+with the Lagrangian being:
+L(u2;;) =1
+2u>
+2AA>u2(1
+2u>
+2u21)u>
+1u2:
+By taking the partial derivative with respect to u2we obtain the necessary
+condition:
+AA>u2u2u1= 0:
+Multiply the equation by u1from the left:
+u>
+1AA>u2u>
+1u2u>
+1u1= 0;
+and noting from above that u>
+1AA>u2=u>
+1u2= 0 we obtain = 0. As a
+result we obtain:
+AA>u2=u2; 5.1 PCA: Statistical Perspective 45
+so once more we have that ;u2form an eigenvalue/eigenvector pair of AA>. As before,should be as large as possible from the remaining spectral de-
+composition. By induction, it can be shown that the remaining principal
+vectors u3;:::;uqare the decreasing order eigenvactors of AA>and the vari-
+ance of the i'th principal component yi=u>
+ixisi. Taken together, the PCA is the solution of the following optimization
+problem:
+maxu1;:::;uq1
+2X
+iku>
+iAk2subjectto u>
+iui= 1;u>
+iuj= 0; i6=j= 1;:::;q:
+It will be useful for later to write the optimization function in a more concise
+manner as follows. Let Ube thenqmatrix whose columns are uiand
+D=diag(1;:::;q) is anqqdiagonal matrix and 12:::q. Then
+from above we have that U>U=IandAA>U=UD. Using the fact that
+trace (xy>) =x>y,trace (AB) =trace (BA) andtrace (A+B) =trace (A)+
+trace (B) we can convertP
+iku>
+iAk2totrace (U>AA>U) as follows:
+X
+iu>
+iAA>ui=X
+itrace (A>uiu>
+iA) =trace (A>(X
+iuiu>
+i)A)
+=trace (A>UU>A) =trace (U>AA>U)
+Thus, PCA becomes the solution of the following optimization function:
+max
+U2Rnqtrace (U>AA>U)subject to U>U=I: (5.1)
+The solution, as saw above, is that U= [u1;:::;uq] consists of the decreasing
+order eigenvectors of AA>. At the optimum, trace (U>AA>U) is equal to
+trace (D) which is equal to the sum of eigenvalues 1+:::+q. It is worthwhile noting that when q=n,UU>=U>U=I, and the PCA
+transform is a change of basis in Rnknown as Karhunen-Loeve transform. To conclude, the PCA transform looks for qorthogonal direction vectors
+(called the principal axes) such that the projection of input sample vectors
+onto the principal directions has the maximal spread, or equivalently that
+the variance of the output coordinates y=U>xis maximal. The principal
+directions are the leading (with respect to descending eigenvalues) qeigen-
+vectors of the matrix AA>. Whenq=n, the principal directions form a
+basis ofRnwith the property of de-correlating the data and maximizing the
+variance of the coordinates of the sample input vectors. 46 Spectral Analysis I: PCA, LDA, CCA
+5.1.2 Decorrelation: Diagonalization of the Covariance Matrix
+In the previous section we saw that PCA generates a new coordinate system
+y=U>xwhere the coordinates y1;:::;yqofxin the new system are uncorre-
+lated. This means that the covariance matrix over the principle components
+should be diagonal. In this section we will explore this perspective in more
+detail. The covariance matrix xof the sample data x1;:::;xmwith zero mean
+is
+(1=m)X
+ixix>
+i= (1=m)AA>;
+therefore the matrix AA>we derived above is a scaled version of the co-
+variance of the sample data (see Appendix A). The scale factor 1 =mwas
+unimportant in the process above because the eigenvectors are of unit norm,
+thus any scale of AA>would produce the same set of eigenvectors. The o -diagonal entries of the covariance matrix xrepresent the corre-
+lation (a measure of statistical dependence) between the i'th and j'th com-
+ponent vectors, i.e., the entries of the input vectors x. The existence of
+correlations among the components (features) of the input signal is a sign
+of redundancy, therefore from the point of view of transforming the input
+representation into one which is lessredundant, we would like to  nd a
+transformation y=U>xwith an output representation ywhich is associ-
+ated with a diagonal covariance matrix y, i.e., the components of yare
+uncorrelated. Formally, y= (1=m)P
+iyiy>
+i= (1=m)U>AA>U, therefore we wish to
+ nd annqmatrix for which U>AA>Uis diagonal. If in addition, we
+would require that the variance of the output coordinates is maximized,
+i.e.,trace (U>AA>U) is maximal (but then we need to constrain the length
+of the column vectors of U, i.e., setkuik= 1) then we would get a unique
+solution for Uwhere the columns are orthonormal and are de ned as the  rst
+qeigenvectors of the covariance matrix x. This is exactly the optimization
+problem de ned by eqn. (5.1). We see therefore that PCA \decorrelates" the input data. Decorrelation
+and statistical independence are not the same thing. If the coordinates are
+statistically independent then the covariance matrix is diagonal y, but it does
+not follow that uncorrelated variables must be statistically independent |
+covariance is just one measure of dependence. In fact, the covariance is a
+measure of pairwise dependency only. However, it is a fact that uncorrelated
+yxy=P
+xP
+y(xx)(yy)p(x;y) =P
+xP
+y(xx)(yy)p(x)(p(y) = (P
+x(x
+x)p(x))(P
+y(yy)p(y)) = 0 5.2 PCA: Optimal Reconstruction 47
+variables are statistically independent if they have a multivariate normal
+distribution (a Gaussian). In other words, if the sample data xare drawn
+from a probability distribution p(x) which has Gaussian form, the PCA
+transforms the sample data into a statistically independent set of variables
+y=U>x. The details are explained below. Recall that a multivariate normal distribution of the random variables
+x= (x1;:::;xn)>is de ned as p(x)N(;):
+p(x) =1
+(2)n=2jj1=2e1
+2(x)>1(x):
+Also recall that a linear combination of the variables produces also a normal
+distribution N(U>;U>U):
+y=X
+y(yy)(yy)>=X
+x(U>xU>x)(U>xU>x)>=U>xU;
+therefore choose Usuch that y=U>Uis a diagonal matrix y=
+diag(2
+1;:::;2
+n). We have in that case:
+p(x) =1
+(2)n=2Q
+iie1
+2P
+ixii
+i2
+which can be written as a product of univariate normal distributions pxi(xi):
+p(x) =nY
+i=11
+(2)1=2ie1
+2xii
+i2
+=nY
+i=1pxi(xi);
+which proves the assertion that decorrelated normally distributed variables
+are statistically independent.
+5.2 PCA: Optimal Reconstruction
+A di erent, yet equivalent, perspective on the PCA transformation is as an
+optimal reconstruction (in a least squares sense) after a dimension reduction. We are given a sample data as before x1;:::;xmand we are looking for a small
+number of orthonormal principal vectors u1;:::;uqwhereq < min (n;k)
+which de ne a q-dimensional linear subspace of Rnwhich bestapproximate
+the original input vectors in a least squares sense. In other words, the
+projection ^xiof the sample points xionto the q-dimensional subspace should
+minimizeP
+ikxi^xik2over all possible q-dimensional subspaces of Rn. LetUbe the subspace spanned by the principal vectors (columns of U)
+and letPbe thennprojection matrix mapping a point x2Rnonto its
+projection ^x2U. From the de nition of projection, the vector x^xmust 48 Spectral Analysis I: PCA, LDA, CCA
+be orthogonal to the subspace U. Let y= (y1;:::;yq) be the coordinates of ^x
+with respect to the principal vectors, i.e., Uy=^x. Then, from orthogonality
+we have that ( xUy)>Uw= 0 for all vectors w2Rn. Since this is true
+for all wthenU>UyU>x= 0. Therefore, y= (U>U)1U>xand as a
+result the projection matrix Pbecomes:
+P=U(U>U)1U>;
+satisfyingPx=^x. In the case the columns of Uare orthonormal, U>U=I,
+we haveP=UU>. We are ready now to describe the optimization problem
+onU: we wish to  nd an orthonormal set of principal vectors, U>U=I,
+such thatP
+ikxiUU>xik2is minimized. Note thatP
+ikxiUU>xik2=kAUU>Ak2
+FwherekBk2
+F=P
+i;jb2
+ij
+is the square Frobenious norm of a matrix. The optimal reconstruction
+problem therefore becomes:
+min
+UkAUU>Ak2
+Fsubject to U>U=I:
+We will show now that:
+argmin
+UkAUU>Ak2
+F= argmax
+Utrace (U>AA>U);
+which shows that the optimal reconstruction problem is solved by PCA
+(recall Eqn. 5.1). From the identity kBk2
+F=trace (BB>), we have:
+kAUU>Ak2
+F=trace ((AUU>A)(AUU>A)>):
+Expanding the right hand side gives us:
+trace ((AUU>A)(AUU>A)>) =trace (AA>)trace (AA>UU>)
+trace (UU>AA>) +trace (UU>AA>UU>)
+The second and third term are equal (commutativity of trace) and is also
+equal to the 4th term due to commutativity of the trace and U>U=I. Taken together:
+kAUU>Ak2
+F=trace (AA>)trace (U>AA>U):
+To conclude, we have proven that by taking the  rst qeigenvectors of AA>
+we obtain a linear subspace which is as close as possible (in a least squares
+sense) to the original sample data. Hence, PCA can be viewed as a vehi-
+cle for optimal reconstruction after dimension reduction. The optimization 5.3 The Case n>>m 49
+problem whose solution is the leading qeigenvectors of AA>is described in
+eqn. 5.1:
+max
+U2Rnqtrace (U>AA>U)subject to U>U=I:
+5.3 The Case n>>m
+Consider the situation where n, the dimension of the input vectors, is rela-
+tively large compared to the number of sample vectors m. For example, con-
+sider input vectors representing 50 50 sized images of faces, i.e., n= 2500,
+wherem= 100. In other words, we are looking for a small number of \face
+templates" (known as \eigenfaces") which approximate well the original set
+of 100 face images. In this case, AA>is very large, 2500 2500, yet the num-
+ber of non-vanishing eigenvalues cannot be higher than 100. Given that the
+eigendecomposition process is O(25003), the computational burden would
+be very high. However, it is possible to perform an eigendecomposition on
+A>A(a 100100 matrix) instead, as shown next. Let the columns of Qbe the  rstq<m eigenvectors of A>A, i.e.,A>AQ=
+QDwhereDis diagonal containing the corresponding eigenvalues. After
+pre-multiplying both sides by Awe obtain:
+AA>(AQ) = (AQ)D;
+from which we conclude that AQcontains the  rst qeigenvectors (but un-
+normalized) of AA>. We have therefore that U=AQD1
+2because:
+U>U=D1
+2Q>A>AQD1
+2=D1
+2DD1
+2=I;
+where we used the fact that Q>A>AQ=D. Note that eigenvalues of A>A
+andAA>are the same (because AA>(AQD1
+2) = (AQD1
+2)D).
+5.4 Kernel PCA
+We can take the case n>>m described in the previous section one step fur-
+ther and consider such large values of nwhich are practically uncomputable
+| a situation which results when mapping the original input vectors to a
+high dimensional space: (x) where:Rn! F for whichdim(F)>> n . For example, (x) representing the d'th order monomials of the coordinates
+ofx, i.e.,dim(F) =n+d1
+d
+which is exponential in d. The mappings
+of interest are those which are paired with a non-linear kernel function:
+k(x;x0) =(x)>(x0). Performing PCA on A= [(x1);:::; (xm)] is equivalent to  nding the 50 Spectral Analysis I: PCA, LDA, CCA
+non-linear surface in Rn(the nature of the non-linearity depends on the
+choice of()) which best approximates the original sample data x1;:::;xm. The problem is that AA>is not computable | however A>Ais computable
+because (A>A)ij=k(xi;xj). From the previous section, U=AQD1
+2=AVcontains the  rst qeigen-
+vectors ofAA>(whereQandDare computable). Since Aitself is not
+computable we cannot represent Uexplicitly, but we can project a new
+vector(x) onto the principal directions u1;:::;uqand obtain the principal
+components, i.e., the output vector y=U>(x), as follows.
+y=U>(x) =V>A>(x) =V>0
+BBBB@k(x1;x)
+:
+:
+:
+k(xm;x)1
+CCCCA:
+Given the principal components (entries of y=U>(x) of(x)) we can
+measure, for example, the distance between(x) and the projection^(x) =
+UU>(x) =Uyonto the linear subspace spanned by u1;:::;uq(without the
+need to explicitly compute the principal axes ui), as follows.
+k(x)^(x)k2=(x)>(x) +^(x)>^(x)2(x)>^(x)
+=k(x;x) +y>U>Uy2(x)>(UU>(x))
+=k(x;x)y>y2y>y
+=k(x;x)kyk2
+5.5 Fisher's LDA: Basic Idea
+We now extend the variance preserving approach for data representation for
+labeled data sets. We will focus on 2-class sets and look for a separating
+hyperplane:
+f(x) =w>x+b;
+such that xbelongs to the  rst class if f(x)>0 and xbelongs to the second
+class iff(x)<0. In the statistical literature this type of function is called
+alinear discriminant function . The decision boundary is given by the set
+of points satisfying f(x) = 0 which is a hyperplane. Fisher's (1936) Linear
+Discriminant Analysis (LDA) is a variance preserving approach for  nding
+a linear discriminant function. 5.5 Fisher's LDA: Basic Idea 51
+Fig. 5.1. Linear discriminant analysis based on class centers alone is not sucient. Seeking a projection which maximizes the distance between the projected centers
+will prefer the horizontal axis over the vertical, yet the two classes overlap on the
+horizontal axis. The projected distance along the vertical axis is smaller yet the
+classes are better separated. The conclusion is that the sample variance of the two
+classes must be taken into consideration as well. We will then introduce another popular statistical technique called Canon-
+ical Correlation Analysis (CCA) for learning the mapping between input and
+output vectors using the notion "angle" between subspaces. What is common in the three techniques PCA, LDA and CCA is the use
+of spectral matrix analysis | i.e., what can you do with eigenvalues and
+eigenvectors of matrices representing subspaces of the data? These tech-
+niques produce optimal results for normally distributed data and are very
+easy to implement. There is a large variety of uses of spectral analysis in
+statistical and learning literature including spectral clustering, Multi Di-
+mensional Scaling (MDS) and data modeling in general. To appreciate the general idea behind Fisher's LDA consider Fig. 5.1. Let
+the centers of classes one and two be denoted by 1and2respectively. A
+linear discriminant function is a projection onto a 1D subspace such that
+the classes would be separated the most in the 1D subspace. The obvious
+ rst step in this kind of analysis is to make sure that the projected centers
+^1;^2would be separated as much as possible. We can easily see that the
+direction of the 1D subspace should be proportional to 12as follows:
+(^1^2)2=w>1
+kwkw>2
+kwk2
+=w>
+kwk(12)2
+:
+The right-hand term is maximized when w12. As illustrated in 52 Spectral Analysis I: PCA, LDA, CCA
+Fig. 5.1, this type of consideration is not sucient to capture separability
+in the projected subspace because the spread (variance) of the data points
+around their centers also play an important role. For example, the horizontal
+axis in the  gure separates the centers better than the vertical axis but on
+the other hand does a worse job in separating the classes themselves because
+of the way the data points are spread around their centers. The argument
+in favor of separating the centers would work if the data points were living
+in a hyper-sphere around the centers, but will not be sucient otherwise. The basic idea behind Fisher's LDA is to consider the sample covariance
+matrix of the individual classes as well as their centers, in the following way. The optimal 1D projection would that which maximizes the variance of the
+projected centers while minimizes the variance of the projected data points
+of each class separately. Mathematically, this idea can be implemented by
+maximizes the following ratio:
+maxw(^1^2)2
+s2
+1+s2
+2;
+wheres2
+1is the scaled variance of the projected points of the  rst class:
+s2
+1=X
+xi2C1(^xi^1)2;
+and likewise,
+s2
+2=X
+xi2C2(^xi^2)2;
+where ^x=w>
+kwkxi+b. We will now formalize this approach and derive its solution. We will begin
+with a general description of a multiclass problem where the sample data
+points belong to qdi erent classes, and later focus on the case of q= 2.
+5.6 Fisher's LDA: General Derivation
+Let the sample data points Sbe members of qclassesC1;:::;Cqwhere the
+number of points belonging to class Ciis denoted by liand the total number
+of the training set is l=P
+ili. Letjdenote the center of class Ciand
+denote the center of the complete training set S:
+j=1
+ljX
+bfxi2Cjxi
+=1
+lX
+xi2Sxi 5.6 Fisher's LDA: General Derivation 53
+LetAjbe the matrix associated with class Cjwhose columns consists of the
+mean shifted data points:
+Aj= [x1j;:::;xljj]xi2Cj:
+Then,1
+ljAjA>
+jis the covariance matrix associated with class Cj. LetSw
+(where "w" stands for "within") be the sum of the class covariance matrices:
+Sw=qX
+i1
+ljAjA>
+j:
+From the discussion in the previous section, it is1
+kwk2w>Swwwhich we
+wish to minimize. To see why this is so, note
+X
+xi2Cj(^xi^j)2=X
+xi2Cjw>(xij)2
+kwk2=1
+kwk2w>AjA>
+jw:
+LetBbe the matrix holding the class centers:
+B= [1;:::;q];
+and letSb=1
+qBB>(where "b" stands for "between"). From the discussion
+above it is1
+kwk2w>Sbw=P
+i(^i^)2which we wish to maximize . Taken
+together, we wish to maximize the ratio (called "Rayleigh's quotient"):
+maxwJ(w) =w>Sbw
+w>Sww:
+The necessary condition for optimality is:
+@J
+@w=Sbw(w>Sww)Sww(w>Sbw)
+(w>Sww)2= 0;
+From which we obtain the generalized eigensystem:
+Sbw=J(w)Sww: (5.2)
+That is, wis the leading eigenvector of S1
+wSb(assumingSwis invertible). The general case of  nding qsuch axes involves  nding the leading general-
+ized eigenvectors of ( Sb;Sw) | the derivation is out of scope of this lecture. Note that since S1
+wSbis not symmetric there may be no real-value solution,
+which is a complication will not pursue further in this course. Instead we
+will focus now on the 2-class ( q= 2) setting below. 54 Spectral Analysis I: PCA, LDA, CCA
+5.7 Fisher's LDA: 2-class
+The general derivation is simpli ed when there are only two classes. The
+covariance matrix BB>becomes a rank-1 matrix:
+BB>= (1)(1)>+ (2)(2)>= (12)(12)>:
+As a result, BB>wis a vector in direction 12. Therefore, the solution
+forwfrom eqn. 5.2 is:
+w=S1
+w(12):
+The decision boundary w>(x) = 0 becomes:
+x>S1
+w(12)1
+2(1+2)>S1
+w(12) = 0: (5.3)
+This decision boundary will surface again in the course when we consider
+Bayseian inference. It will be shown that this decision boundary is the
+Maximum Likelihood solution in the case where the two classes are normally
+distributed with means 1;2and with the same covariance matrix Sw.
+5.8 LDA versus SVM
+Both LDA and SVM search for a so called "optimal" linear discriminant
+function, what is the di erence? The heart of the matter lies in the de nition
+of what constitutes a sucient compact representation of the data. In LDA
+the assumption is that each class can be represented by its mean vector and
+its spread (i.e., covariance matrix). This is true for normally distributed
+data | but not true in general. This means that we should expect that
+LDA will produce the optimal discriminant linear function when each of the
+classes are normally distributed. With SVM, on the other hand, there is no assumption on how the data
+is distributed. Instead, the emerging result is that the data is represented
+by the subset of data points which lie on the boundary between the two
+classes (the so called support vectors). Rather than making a parametric
+assumption on how the data can be captured (i.e., mean and covariance) the
+theory shows that the data can be captured by a special subset of points. The
+tools, as a result, are naturally more complex (quadratic linear programming
+versus spectral matrix analysis) | but the advantage is that optimality is
+guaranteed without making assumptions on the distribution of the data (i.e.,
+distribution free). It can be shown that SVM and LDA would produce the
+same result if the class data is normally distributed. 5.9 Canonical Correlation Analysis 55
+5.9 Canonical Correlation Analysis
+CCA is a technique for learning a mapping f(x) =ywhere x2Rkand
+y2Rsusing the notion of subspace similarity (an extension of the inner
+product between two vectors) from a training set of ( xi;yi),i= 1;:::;n . Such
+a mapping, where ycan be any point in Rkas opposed to a discrete set of
+labels, is often referred to as a "regression" (as opposed to "classi cation"). Like in PCA and LDA, the approach would be to look for projection axes
+such that the projection of the input and output vectors on those axes satisfy
+certain requirements | and like PCA and LDA the tools we would be using
+is matrix spectral analysis. It will be convenient to stack our vectors as rows of an input matrix Aand
+output matrix B. LetAbe annkmatrix whose rows are x>
+1;:::;x>
+nand
+Bis thensmatrix whose rows are y>
+1;:::;y>
+n. Consider vectors u2Rk
+andv2Rsand project the input and output data onto them producing
+Au= (x>
+1u;:::;x>
+nu) andBv. The requirement we would like to place on
+the projection axes is that AuBv, or in other words that ( Au)>(Bv)
+is maximal. The requirement therefore is that the projection of the input
+points onto the uaxis is similar to the projection of the output points
+onto the vaxis. If we extend this notion to multiple axes u1;:::;uq(not
+necessarily orthogonal) and v1;:::;vqwhereqmin(k;s) our requirement
+becomes that the new coordinates of the input points projected onto the
+subspace spanned by the uvectors are similar to the new coordinates of
+the output points projected onto the subspace spanned by the vvectors. In other words, we wish to  nd two q-dimensional subspaces one of Rkand
+the other of Rssuch that the two sets of projected points are as aligned as
+possible. CCA goes a step further and makes the assumption that the input/output
+relationship is solely determined by the relation (angles) between the column
+spaces ofA;B. In other words, the particular columns of Aare not really
+important, what is important is the space UAspanned by the columns. Since g=Auis a point in UA(a linear combination of the columns of
+A) and h=Bvis a point in UB, then g>his the cosine angle, cos( )
+between the two axes provided that we normalize the vectors gandh. If
+we continue this line of reasoning recursively, we obtain a set of angles
+01:::q(=2), called "principal angles", between the two
+subspaces uniquely de ned as:
+cos(j) = maxg2UAmax
+h2UBg>h (5.4) 56 Spectral Analysis I: PCA, LDA, CCA
+subject to:
+g>g=h>h= 1;h>hi= 0;g>gi= 0; i = 1;:::;j1
+As a result, we obtain the following optimization function over axes u;v:
+maxu;vu>A>Bvs:t:kAuk2= 1;kBvk2= 1:
+To solve this problem we  rst perform a "QR" factorization of AandB. A
+"QR" factorization of a matrix Ais a Grahm-Schmidt process resulting in
+an orthonormal set of vectors arranged as the columns of a matrix QAwhose
+column space is equal to the column space of A, and a matrix RAwhich
+contains the coecients of the linear combination of the columns of QAsuch
+thatA=QARA. Since orthoganilzation is not unique, the Grahm-Schmidt
+process perfroms the orthogonalization such that RAis an upper-diagonal
+matrix. Likewise let B=QBRB. Because the column spaces of AandQA
+are the same, then for every uthere exists a ^usuch thatAu=QA^u. Our
+optimization problem now becomes:
+max
+^u;^v^u>Q>
+AQB^vs:t:k^uk2= 1;k^vk2= 1:
+The solution of this problem is when ^uand^vare the leading singular vectors
+ofQ>
+AQB. The singular value decomposition (SVD) of any matrix Eis a
+decomposition E=UDV>where the columns of Uare the leading eigen-
+vectors ofEE>, the rows of V>are the leading eigenvectors of E>Eand
+Dis a diagonal matrix whose entries are the corresponding square eigen-
+values (note that the eigenvalues of EE>andE>Eare the same). The
+SVD decomposition has the property that if we keep only the  rst qleading
+eigenvectors then UDV>is the closest (in least squares sense) rank qmatrix
+toE. Therefore, let ^UD^V>be the SVD of Q>
+AQBusing the  rst qeigenvectors. Then, our sought after axes U= [u1;:::;uq] is simply R1
+A^Uand likewise
+and the axes V= [v1;:::;vq] is equal to R1
+B^V. The axes are called "canon-
+ical vectors", and the vectors gi=Aui(mutually orthogonal) are called
+"variates". The concept of principal angles is due to Jordan in 1875, where
+Hotelling in 1936 is the  rst to introduce the recursive de nition above. Given a new vector x2Rkthe resulting vector ycan be found by solving
+the linear system U>x=V>y(since our assumption is that in the new basis
+the coordinates of xandyare similar). To conclude, the relationship between AandBis captured by creating
+similar variates, i.e., creating subspaces of dimension qsuch that the projec-
+tions of the input vectors and the output vectors have similar coordinates. 5.9 Canonical Correlation Analysis 57
+The process for obtaining the two q-dimensional subspaces is by performing
+a QR factorization of AandBfollowed by an SVD. Here again the spectral
+analysis of the input and output data matrices plays a pivoting role in the
+input/output association. 6
+Spectral Analysis II: Clustering
+In the previous lecture we ended up with the formulation:
+max
+Gmktrace (G>KG) s:t: G>G=I (6.1)
+and showed the solution Gis the leading eigenvectors of the symmetric pos-
+itive semi de nite matrix K. WhenK=AA>(sample covariance matrix)
+withA= [x1;:::;xm],xi2Rn, those eigenvectors form a basis to a k-
+dimensional subspace of Rnwhich is the closest (in L2norm sense) to the
+sample points xi. The axes (called principal axes) g1;:::;gkpreserve the
+variance of the original data in the sense that the projection of the data
+points on the g1has maximum variance, projection on g2has the maximum
+variance over all vectors orthogonal to g1, etc. The spectral decomposition
+of the sample covariance matrix is a way to "compress" the data by means
+of linear super-position of the original coordinates y=G>x. We also ended with a ratio formulation:
+maxww>S1w
+w>S2w
+whereS1;S2where scatter matrices de ned such that w>S1wis the variance
+of class centers (which we wish to maximize) and w>S2wis the sum of
+within class variance (which we want to minimize). The solution wis the
+generalized eigenvector S1w=S2wwith maximal . In this lecture we will show additional applications where the search for
+leading eigenvectors plays a pivotal part of the solution. So far we have
+seen how spectral analysis relates to PCA and LDA and today we will fo-
+cus on the classic Data Clustering problem of partitioning a set of points
+x1;:::;xmintok2 classes, i.e., generating as output indicator variables
+y1;:::;ymwhereyi2f1;:::;kg. We will begin with "K-means" algorithm for
+clustering and then move on to show how the optimization criteria relates
+58 6.1 K-means Algorithm for Clustering 59
+to grapth-theoretic approaches (like Min-Cut, Ratio-Cut, Normalized Cuts)
+and spectral decomposition.
+6.1 K-means Algorithm for Clustering
+The K-means formulation (originally introduced by [4]) assumes that the
+clusters are de ned by the distance of the points to their class centers only. In other words, the goal of clustering is to  nd those kmean vectors c1;:::;ck
+and provide the cluster assignment yi2f1;:::;kgof each point xiin the set. The K-means algorithm is based on an interleaving approach where the
+cluster assignments yiare established given the centers and the centers are
+computed given the assignments. The optimization criterion is as follows:
+min
+y1;:::;ym;c1;:::;ckkX
+j=1X
+yi=jkxicjk2(6.2)
+Assume that c1;:::;ckare given from the previous iteration, then
+yi= argmin
+jkxicjk2;
+and next assume that y1;::;ym(cluster assignments) are given, then for any
+setSf1;:::;mgwe have that
+1
+jSjX
+j2Sxj= argmin
+cX
+j2Skxjck2:
+In other words, given the estimated centers in the current round, the new
+assignments are computed by the closest center to each point xi, and then
+given the updated assignments the new centers are estimated by taking the
+mean of each cluster. Since each step is guaranteed to reduce the optimiza-
+tion energy the process must converge | to some local optimum. The drawback of the K-means algorithm is that the quality of the local
+optimum strongly depends on the initial guess (either the centers or the
+assignments). If we start with a wild guess for the centers it would be fairly
+unlikely that the process would converge to a good local minimum (i.e. one
+that is close to the global optimum). An alternative approach would be to
+de ne an approximate but simpler problem which has a closed form solution
+(such as obtained by computing eigenvectors of some matrix). The global
+optimum of the K-means is an NP-Complete problem (mentioned brie y in
+the next section). Next, we will rewrite the K-means optimization criterion in matrix form
+and see that it relates to the spectral formulation (eqn. 6.1). 60 Spectral Analysis II: Clustering
+6.1.1 Matrix Formulation of K-means
+We rewrite eqn. 6.2 as follows [7]. Instead of carrying the class variables yi
+we de ne class sets 1;:::; kwhere if1;:::;ngwithS j=f1;:::;ng
+and iT j=;. The K-means optimization criterion seeks for the centers
+and the class sets:
+min
+ 1;:::; k;c1;:::;ckkX
+j=1X
+i2 jkxicjk2:
+Letlj=j jjand following the expansion of the squared norm and dropping
+x>
+ixiwe end up with an equivalent problem:
+min
+ 1;:::; k;c1;:::;ckkX
+j=1ljc>
+jcj2kX
+j=1X
+i2 jx>
+icj:
+Next we substitute cjwith its de nition: (1 =lj)P
+i2 jxjand obtain a new
+equivalent formulation where the centers cjare eliminated form considera-
+tion:
+min
+ 1;:::; kkX
+j=11
+ljX
+r;s2 jx>
+rxs
+which is more conveniently written as a maximization problem:
+max
+ 1;:::; kkX
+j=11
+ljX
+r;s2 jx>
+rxs: (6.3)
+Since the resulting formulation involves only inner-products we could have
+replaced xiwith(xi) in eqn. 6.2 where the mapping () is chosen such
+that(xi)>(xj) can be replaced by some non-linear function (xi;xj) |
+known as the "kernel trick" (discussed in previous lectures). Having the
+ability to map the input vectors onto some high-dimensional space before
+K-means is applied provides more  exibility and increases our chances of
+getting out a "good" clustering from the global K-means solution (again,
+the local optimum depends on the initial conditions so it could be "bad"). The RBF kernel is quite popular in this context (xi;xj) =ekxixjk2=2
+withsome pre-determined parameter. Note that (xi;xj)2(0;1] which
+can be interpreted loosely as the probability of xiandxjto be clustered
+together. LetKij=(xi;xj) makingKammsymmetric positive-semi-de nite
+matrix often referred to as the "anity" matrix. Let Fbe annnmatrix
+whose entries are Fij= 1=lrif (i;j)2 rfor some class randFij= 0 6.1 K-means Algorithm for Clustering 61
+otherwise. In other words, if we sort the points xiaccording to cluster
+membership, then Fis a block diagonal matrix with blocks F1;:::;Fkwhere
+Fr= (1=lr)11>is anlrlrblock of 1's scaled by 1 =lr. Then, Eqn. 6.3 can
+be written in terms of Kas follows:
+max
+FnX
+i;j=1KijFij=trace (KF) (6.4)
+In order to form this as an optimization problem we need to represent the
+structure of Fin terms of constraints. Let Gbe annkcolumn-scaled
+indicator matrix: Gij= (1=p
+lj) ifi2 j(i.e.,xibelongs to the j'th class)
+andGij= 0 otherwise. Let g1;:::;gkbe the columns of Gand it can be easily
+veri ed that grgr>=diag(0;::;Fr;0;::;0) therefore F=P
+jgjg>
+j=GG>. Sincetrace (AB) =trace (BA) we can now write eqn. 6.4 in terms of G:
+max
+Gtrace (G>KG)
+under conditions on Gwhich we need to further spell out. We will start with the necessary conditions. Clearly G0 (has non-
+negative entries). Because each point belongs to exactly one cluster we must
+haveG>Gij= 0 wheni6=jandG>Gii= (1=li)1>1= 1, thusG>G=I. Furthermore we have that the rows and columns of F=GG>sum up to
+1, i.e.,F1=1;F>1=1which means that Fisdoubly stochastic which
+translates to the constraint GG>1=1onG. We have therefore three
+necessary conditions on G: (i)G0, (ii)G>G=I, and (iii)GG>1=1. The claim below asserts that these are also sucient conditions:
+Claim 4 The feasibility set of matrices Gwhich satisfy the three conditions
+G0; GG>1=1andG>G=Iare of the form:
+Gij=(1p
+ljxi2 j
+0otherwise)
+Proof: FromG0 and g>
+rgs= 0 we have that GirGis= 0, i.e.,G
+has a single non-vanishing element in each row. It will be convenient to
+assume that the points are sorted according to the class membership, thus
+the columns of Ghave the non-vanishing entries in consecutive order and
+letljbe the number of non-vanishing entries in column gj. Let ujthe
+vector ofljentries holding only the non-vanishing entries of gj. Then,
+the doubly stochastic constraint GG>1=1results that ( 1>uj)uj=1for
+j= 1;:::;k . Multiplying 1from both sides yields ( 1>uj)2=1>1=lj,
+therefore uj= (1=p
+lj)1. 62 Spectral Analysis II: Clustering
+This completes the equivalence between the matrix formulation:
+max
+G2Rmktrace (G>KG) s:t: G0;G>G=I;GG>1=1 (6.5)
+and the original K-means formulation of eqn. 6.2. We have obtained the same optimization criteria as eqn. 6.1 with addi-
+tional two constraints: Gshould be non-negative and GG>should be doubly
+stochastic. The constraint G>G=Icomes from the requirement that each
+point is assigned to one class only. The doubly stochastic constraint comes
+from a "class balancing" requirement which we will expand on below.
+6.2 Min-Cut
+We will arrive to eqn. 6.5 from a graph-theoretic perspective. We start
+with representing the graph Min-Cut problem in matrix form, as follows. A convenient way to represent the data to be clustered is by an undirected
+graph with edge-weights where V=f1;:::;mgis the vertex set, EVV
+is the edge set and :E! R+is the positive weight function. Vertices
+of the graph correspond to data points xi, edges represent neighborhood
+relationships, and edge-weights represent the similarity (anity) between
+pairs of linked vertices. The weight adjacency matrix Kholds the weights
+whereKij=(i;j) for (i;j)2EandKij= 0 otherwise. Acutin the graph is de ned between two disjoint sets A;BV,A[
+B=V, is the sum of edge-weights connecting the two sets: cut(A;B) =P
+i2A;j2BKijwhich is a measure of dissimilarity between the two sets. The
+Min-Cut problem is to  nd a minimal weight cut in the graph (can be solved
+in polynomial time through Max Network Flow solution). The following
+claim associates algebraic conditions on Gwith an indicator matrix:
+Claim 5 The feasibility set of matrices Gwhich satisfy the three conditions
+G0; G1=1andG>G=Dfor some diagonal matrix Dare of the form:
+Gij=1xi2 j
+0otherwise
+Proof: LetG= [g1;:::;gk]. FromG0 and g>
+rgs= 0 we have that
+GirGis= 0, i.e.,Ghas a single non-vanishing element in each row. From
+G1=1the single non-vanishing entry of each row must have the value of
+1. In the case of two classes ( k= 2), the function tr(G>KG) is equal toP
+(i;j)2 1Kij+P
+(i;j)2 2Kij. Therefore max Gtr(G>KG) is equivalent to 6.3 Spectral Clustering: Ratio-Cuts and Normalized-Cuts 63
+minimizing the cut:P
+i2 1;j2 2Kij. As a result, the Min-Cut problem is
+equivalent to solving the optimization problem:
+max
+G2Rm2tr(G>KG)s:t G0; G1=1; G>G=diag (6.6)
+We seem to be close to eqn. 6.5 with the di erence that Gis orthogonal
+(instead of orthonormal) and the doubly-stochasitc constraint is replaced
+byG1=1. The di erence can be bridged by considering a "balancing"
+requirement. Min-Cut can produce an unbalanced partition where one set
+of vertices is very large and the other contains a spurious set of vertices
+having a small number of edges to the larger set. This is an undesirable
+outcome in the context of clustering. Consider a "balancing" constraint
+G>1= (m=k)1which makes a strict requirement that all the kclusters have
+an equal number of points. We can relax the balancing constraint slightly by
+combining the balancing constraint with G1=1into one single constraint
+GG>1= (m=k)1, i.e.,GG>is scaled doubly stochastic. Note that the two
+conditionsGG>1= (m=k)1andG>G=Dresult inD= (m=k)I. Thus we
+propose the relaxed-balanced hard clustering scheme:
+max
+Gtr(G>KG)s:t G0; GG>1=m
+k1; G>G=m
+kI
+The scalem=k is a global scale that can be dropped without a ecting the
+resulting solution, thus the Min-Cut with a relaxed balancing requirement
+becomes eqn. 6.5 which we saw is equivalent to K-means:
+max
+Gtr(G>KG)s:t G0; GG>1=1; G>G=I:
+6.3 Spectral Clustering: Ratio-Cuts and Normalized-Cuts
+We saw above that the doubly-stochastic constraint has to do with a "bal-
+ancing" desire. A further relaxation of the balancing desire is to perform the
+optimization in two steps: (i) replace the anity matrix Kwith the closest
+(under some chosen error measure) doubly-stochastic matrix K0, (ii)  nd a
+solution to the problem:
+max
+G2Rmktr(G>K0G)s:t G0; G>G=I (6.7)
+becauseGG>should come out close to K0(tr(G>K0G) =tr(K0GG>))
+andK0is doubly-stochastic, then GG>should come out close to satisfying
+a doubly-stochastic constraint | this is the motivation behind the 2-step
+approach. Moreover, we drop the non-negativity constraint G0. Note
+that the non-negativity constraint is crucial for the physical interpretation of 64 Spectral Analysis II: Clustering
+G; nevertheless, for k= 2 clusters it is possible to make an interpretation, as
+we shall next. As a result we are left with a spectral decomposition problem
+of eqn. 6.1:
+max
+G2Rmktr(G>K0G)s:t G>G=I;
+where the columns of Gare the leading eigenvectors of K0. We will refer
+to the  rst step as a "normalization" process and there are two popular
+normalizations in the literature | one leading to Ratio-Cuts and the other
+to Normalized-Cuts.
+6.3.1 Ratio-Cuts
+LetD=diag(K1) which is a diagonal matrix containing the row sums of
+K. The Ratio-Cuts normalization is to look for K0as the closest doubly-
+stochastic matrix to Kby minimizing the L1norm | this turns out to be
+K0=KD+I. Claim 6 (ratio-cut) LetKbe a symmetric positive-semi-de nite whose
+values are in the range [0;1]. The closest doubly stochastic matrix K0under
+theL1error norm is
+K0=KD+I
+Proof: Letr= minFkKFk1s:t: F 1=1; F=F>. SincekKFk1
+k(KF)1k1for any matrix F, we must have:
+rk(KF)1k1=kD11k1=kDIk1:
+LetF=KD+I, then
+kK(KD+I)k1=kDIk1:
+The Laplacian matrix of a graph is DK. Ifvis an eigenvector of the
+LaplacianDKwith eigenvalue , then vis also an eigenvector of K0=
+KD+Iwith eigenvalue 1 and since (DK)1= 0 then the smallest
+eigenvector v=1of the Laplacian is the largest of K0, and the second
+smallest eigenvector of the Laplacian (the ratio-cut result) corresponds to the
+second largest eigenvector of K0. Because the eigenvectors are orthogonal,
+the second eigenvector must have positive and negative entries (because the
+inner-product with 1is zero) | thus the sign of the entries of the second
+eigenvector determines the class membership. 6.3 Spectral Clustering: Ratio-Cuts and Normalized-Cuts 65
+Ratio-Cuts, the second smallest eigenvector of the Laplacian DK, is
+an approximation due to Hall in the 70s [2] to the Min-Cut formulation. Letz2Rmdetermine the class membership such that xiandxjwould be
+clustered together if ziandzjhave similar values. This leads to the following
+optimization problem:
+minz1
+2X
+i;j(zizj)2Kijs:t:z>z= 1
+The criterion function is equal to (1 =2)z>(DK)zand the derivative of the
+Lagrangian (1 =2)z>(DK)z(z>z1) with respect to zgives rise to
+the necessary condition ( DK)z=zand the Ratio-Cut scheme follows.
+6.3.2 Normalized-Cuts
+Normalized-Cuts looks for the closest doubly-stochastic matrix K0inrelative
+entropy error measure de ned as:
+RE(xjjy) =X
+ixilnxi
+yi+X
+iyiX
+ixi:
+We will encounter the relative entropy measure in more detail later in the
+course. We can show that K0must have the form  K for some diagonal
+matrix :
+Claim 7 The closest doubly-stochastic matrix Funder the relative-entropy
+error measure to a given non-negative symmetric matrix K, i.e., which min-
+imizes:
+min
+FRE(FjjK)s:t: F0; F=F>; F1= 1; F>1= 1
+has the form F= Kfor some (unique) diagonal matrix . Proof: The Lagrangian of the problem is:
+L() =X
+ijfijlnfij
+kij+X
+ijkijX
+ijfijX
+ii(X
+jfij1)X
+jj(X
+ifij1)
+The derivative with respect to fijis:
+@L
+@fij= lnfij+ 1lnkij1ij= 0
+from which we obtain:
+fij=eiejkij 66 Spectral Analysis II: Clustering
+LetD1=diag(e1;:::;en) andD2=diag(e1;:::;en), then we have:
+F=D1KD 2
+SinceF=F>andKis symmetric we must have D1=D2. Next, we can show that the diagonal matrix  can found by an iterative
+process where Kis replaced by D1=2KD1=2whereDwas de ned above
+asdiag(K1):
+Claim 8 For any non-negative symmetric matrix K(0), iterating the process
+K(t+1) D1=2K(t)D1=2withD=diag(K(t)1)converges to a doubly
+stochastic matrix. The proof is based on showing that the permanent increases monotonically,
+i.e.perm (K(t+1))perm (K(t)). Because the permanent is bounded the
+process must converge and if the permanent does not change (at the conver-
+gence point) the resulting matrix must be doubly stochastic. The resulting
+doubly stochastic matrix is the closest to Kin relative-entropy. Normalized-Cuts takes the result of the  rst iteration by replacing K
+withK0=D1=2KD1=2followed by the spectral decomposition (in case
+ofk= 2 classes the partitioning information is found in the second leading
+eigenvector of K0| just like Ratio-Cuts but with a di erent K0). Thus,K0
+in this manner is not the closest doubly-stochastic matrix to Kbut is fairly
+close (the  rst iteration is the dominant one in the process). Normalized-Cuts, as the second leading eigenvector of K0=D1=2KD1=2,
+is an approximation to a "balanced" Min-Cut described  rst in [6]. Deriving
+it from  rst principles proceeds as follows:
+Letsum(V1;V2) =sumi2V1;j2V2Kijbe de ned for any two subsets (not
+necessarily disjoint) of vertices. The normalized-cuts measures the cut cost
+as a fraction of the total edge connections to all the nodes in the graph:
+Ncuts (A;B) =cut(A;B)
+sum(A;V)+cut(A;B)
+sum(B;V):
+A minimal Ncut partition will no longer favor small isolated points since the
+cut value would most likely be a large percentage of the total connections
+from that small set to all the other vertices. A related measure Nassoc (A;B)
+de ned as:
+Nassoc (A;B) =sum(A;A)
+sum(A;V)+sum(B;B)
+sum(B;V);
+re ects how tightly on average nodes within the group are connected to each
+other. Given that cut(A;B) =sum(A;V)sum(A;A) one can easily verify 6.3 Spectral Clustering: Ratio-Cuts and Normalized-Cuts 67
+that:
+Ncuts (A;B) = 2Nassoc (A;B);
+therefore the optimal bi-partition can be represented as maximizing Nassoc (A;V
+A). TheNassoc naturally extends to k >2 classes (partitions) as follows:
+Let 1;:::; kbe disjoint sets[j j=V, then:
+Nassoc ( 1;:::; k) =kX
+j=1sum( j; j)
+sum( j;V):
+We will now rewrite Nassoc in matrix form and establish equivalence to
+eqn. 6.7. Let G= [g1;:::;gk] with gj= 1=p
+sum( j;V)(0;:::;0;1;:::1;0:;;;0)
+with the 1s indicating membership to the j'th class. Note that
+g>
+jKgj=sum( j; j)
+sum( j;V);
+thereforetrace (G>KG) =Nassoc ( 1;:::; k). Note also that g>
+iDgi=
+(1=sum ( i;V))P
+r2 idr= 1, therefore G>DG=I. LetG=D1=2Gso we
+have thatG>G=Iandtrace (G>D1=2KD1=2G) =Nassoc ( 1;:::; k). Taken together we have that maximizing Nassoc is equivalent to:
+max
+G2Rmktrace (G>K0G) s:t: G0;G>G=I; (6.8)
+whereK0=D1=2KD1=2. Note that this is exactly the K-means matrix
+setup of eqn. 6.5 where the doubly-stochastic constraint is relaxed into the
+replacement of KbyK0. The constraint G0 is then dropped and the
+resulting solution for Gis thekleading eigenvectors of K0. We have arrived via seemingly di erent paths to eqn. 6.8 which after we
+drop the constraint G0 we end up with a closed form solution consisting
+of thekleading eigenvectors of K0. Whenk= 2 (two classes) one can
+easily verify that the partitioning information is fully contained in the second
+eigenvector. Let v1;v2be the  rst leading eigenvectors of K0. Clearly
+v=D1=21is an eigenvector with eigenvalue = 1:
+D1=2KD1=2(D1=21) =D1=2K1=D1=21:
+In fact= 1 is the largest eigenvalue (left as an exercise) thus v1=D1=21>
+0. SinceK0is symmetric the v>
+2v1= 0 thus v2contains positive and
+negative entries | those are interpreted as indicating class membership
+(positive to one class and negative to the other). The casek>2 is treated as an embedding (also known as Multi-Dimensional
+Scaling) by re-coordinating the points xiusing the rows of G. In other 68 Spectral Analysis II: Clustering
+words, the i'th row of Gis a representation of xiinRk. Under ideal con-
+ditions where Kis block diagonal (the distance between clusters is in nity)
+the rows associated with points clustered together are identical (i.e., the n
+original points are mapped to kpoints inRk) [5]. In practice, one performs
+the iterative K-means in the embedded space. 7
+The Formal (PAC) Learning Model
+We have see so far algorithms that explicitly estimate the underlying dis-
+tribution of the data (Bayesian methods and EM) and algorithms that are
+in some sense optimal when the underlying distribution is Gaussian (PCA,
+LDA). We have also encountered an algorithm (SVM) that made no as-
+sumptions on the underlying distribution and instead tied the accuracy to
+the margin of the training data. In this lecture and in the remainder of the course we will address the
+issue of "accuracy" and "generalization" in a more formal manner. Because
+the learner receives only a  nite training sample, the learning function can
+do very well on the training set yet perform badly on new input instances. What we would like to establish are certain guarantees on the accuracy of
+the learner measured over all the instance space and not only on the training
+set. We will then use those guarantees to better understand what the large-
+margin principle of SVM is doing in the context of generalization. In the remainder of this lecture we will refer to the following notations:
+the class of learning functions is denoted by C. A learning functions is often
+referred to as a "concept" or "hypothesis". A target function ct2Cis a
+function that has zero error on all input instances (such a function may not
+always exist).
+7.1 The Formal Model
+In many learning situations of interest, we would like to assume that the
+learner receives mexamples sampled by some  xed (yet unknown) distri-
+butionDand the learner must do its best with the training set in order to
+achieve the accuracy and con dence objectives. The Probably Approximate
+Correct (PAC) model, also known as the "formal model",  rst introduced by
+69 70 The Formal (PAC) Learning Model
+Valient in 1984, provides a probabilistic setting which formalizes the notions
+of accuracy and con dence. The PAC model makes the following statistical assumption. We assume
+the learner receives a set Sofminstances x1;:::;xm2Xwhich are sampled
+randomly and independently according to a distribution DoverX. In other
+words, a random training set Sof lengthmis distributed according to the
+product probability distribution Dm. The distribution Dis unknown, but
+we will see that one can obtain useful results by simply assuming that Dis
+ xed | there is no need to attempt to recover Dduring the learning process. To recap, we make the following three assumptions: (i) Dis unkown, (ii)
+Dis  xed throughout the learning process, and (iii) the example instances
+are sampled independently of each other (are Identically and Independently
+Distributed | i.i.d.). We distinguish between the "realizable" case where a target concept ct(x)
+is known to exist, and the unrealizable case, where there is no such guar-
+antee. In the realizable case our training examples are Z=f(xi;ct(xi)g,
+i= 1;:::;m andDis de ned over X(sinceyi2Yare given by ct(xi)). In
+the unrealizable case, Z=f(xi;yi)gandDis the distribution over XY
+(each element is a pair, one from Xand the other from Y). We next de ne what is meant by the error induced by a concept function
+h(x). In the realizable case, given a function h2C, the error of his de ned
+with respect to the distribution D:
+err(h) =probD[x:ct(x)6=h(x)] =Z
+x2Xind(ct(x)6=h(x))D(x)dx
+whereind(F) is an indication function which returns '1' if the proposition
+Fistrue and '0' otherwise. The function err(h) is the probability that
+an instance xsampled according to Dwill be labeled incorrectly by h(x). Let>0 be a parameter given to the learner specifying the "accuracy" of
+the learning process, i.e. we would like to achieve err(h). Note that
+err(ct) = 0. In addition, we de ne a "con dence" parameter  >0, also given to the
+learner, which de nes the probability that err(h)>, namely,
+prob[err(h)>]<;
+or equivalently:
+prob[err(h)]1:
+In other words, the learner is supposed to meet some accuracy criteria but
+is allowed to deviate from it by some small probability. Finally, the learning 7.1 The Formal Model 71
+algorithm is supposed to be "ecient" if the running time is polynomial in
+1=;ln(1=);nand the size of the concept target function ct() (measured by
+the number of bits necessary for describing it, for example). We will say that an algorithm Llearns a concept family Cin the formal
+sense (PAC learnable) if for any ct2Cand for every distribution Don the
+instance space X, the algorithm Lgenerates eciently a concept function
+h2Csuch that the probability that err(h)is at least 1. The inclusion of the con dence value could seem at  rst unnatural. What we desire from the learner is to demonstrate a consistent performance
+regardless of the training sample Z. In other words, it is not enough that
+the learner produces a hypothesis hwhose accuracy is above threshold, i.e.,
+err(h), for some training sample Z. We would like the accuracy per-
+formance to hold under alltraining samples (sampled from the distribution
+Dm) | since this requirement could be too dicult to satisfy, the formal
+model allows for some "failures", i.e, situations where err(h)>, for some
+training samples Z, as long as those failures are rare and the frequency of
+their occurrence is controlled (the parameter ) and can be as small as we
+like. In the unrealizable case, there may be no function h2Cfor which
+err(h) = 0, thus we need to de ne what we mean by the best a learning
+algorithm can achieve:
+Opt(C) = min
+h2Cerr(h);
+which is the best that can be done on the concept class Cusing functions
+that map between XandY. Given the desired accuracy and con dence 
+values the learner seeks a hypothesis h2Csuch that:
+prob[err(h)Opt(C) +]1:
+We are ready now to formalize the discussion above and introduce the de -
+nition of the formal learning model (Anthony & Bartlett [1], pp. 16):
+De nition 1 (Formal Model) LetCbe the concept class of functions that
+map from a set XtoY. A learning algorithm Lis a function:
+L:1[
+m=1f(xi;yi)gm
+i=1! C
+from the set of all training examples to Cwith the following property: given
+any;2(0;1)there is an integer m0(;)such that if mm0then, for
+any probability distribution DonXY, ifZis a training set of length m 72 The Formal (PAC) Learning Model
+drawn randomly according to the product probability distribution Dm, then
+with probability of at least 1the hypothesis h=L(Z)2Coutput by
+Lis such that err(h)Opt(C) +. We say that Cis learnable (or PAC
+learnable) if there is a learning algorithm for C. There are few points to emphasize. The sample size m0(;) is a suf-
+ cient sample size for PAC learning CbyLand is allowed to vary with
+;. Decreasing the value of either ormakes the learning problem more
+dicult and in turn a larger sample size is required. Note however that
+m0(;) does not depend on the distribution D! that is, a sucient sample
+size can be given that will work for anydistribution D| provided that
+Dis  xed throughout the learning experience (both training and later for
+testing). This point is a crucial property of the formal model because if the
+sucient sample size is allowed to vary with the distribution Dthen not
+only we would need to have some information about the distribution in or-
+der to set the sample complexity bounds, but also an adversary (supplying
+the training set) could control the rate of convergence of Lto a solution
+(even if that solution can be proven to be optimal) and make it arbitrarily
+slow by suitable choice of D. What makes the formal model work in a distribution-invariant manner
+is that it critically depends on the fact that in many interesting learning
+scenarios the concept class Cis not too complex. For example, we will show
+later in the lecture that any  nite concept class jCj<1is learnable, and
+the sample complexity (in the realizable case) is
+m1
+lnjCj
+:
+In the next lecture we will consider concept classes of in nite size and show
+that despite the fact that the class is in nite it still can be of low complexity! Before we illustrate the concepts above with an example, there is another
+useful measure which is the empirical error (also known as the sample error)
+^err(h) which is de ned as the proportion of examples from Zon whichh
+made a mistake:
+^err(h) =1
+mjfi:h(xi)6=ct(xi)gj
+(replacect(xi) withyifor the unrealizable case). The situation of bounding
+the true error err(h) by minimizing the sample error ^ err(h) is very conve-
+nient | we will get to that later. 7.2 The Rectangle Learning Problem 73
+7.2 The Rectangle Learning Problem
+As an illustration of learnability we will consider the problem (introduced
+in Kearns & Vazirani [3]) of learning an axes-aligned rectangle from positive
+and negative examples. We will show that the problem is PAC-learnable
+and  nd out m0(;). In the rectangle learning game we are given a training set consisting of
+points in the 2D plane with a positive '+' or negative '-' label. The positive
+examples are sampled inside the target rectangle (parallel to the main axes)
+Rand the negative examples are sampled outside of R. Givenmexamples
+sampled i.i.d according to some distribution Dthe learner is supposed to
+generate an approximate rectangle R0which is consistent with the training
+set (we are assuming that R exists) and which satis es the accuracy and
+con dence constraints. We  rst need to decide on a learning strategy. Since the solution R0
+is not uniquely de ned given any training set Z, we need to add further
+constraints to guarantee a unique solution. We will choose R0as the axes-
+aligned concept which gives the tightest  t to the positive examples, i.e., the
+smallest area axes-aligned rectangle which contains the positive examples. If no positive examples are given then R0=;. We can also assume that
+Zcontains at least three non-collinear positive examples in order to avoid
+complications associated with in nitesimal area rectangles. Note that we
+could have chosen other strategies, such as the middle ground between the
+tightest  t to the positive examples and the tightest  t (from below) to the
+negative examples, and so forth. De ning a strategy is necessary for the
+analysis below | the type of strategy is not critical though. We next de ne the error err(R0) on the concept R0generated by our
+learning strategy. We  rst note that with the strategy de ned above we
+always have R0RsinceR0is the tightest  t solution which is consistent
+with the sample data (there could be a positive example outside of R0which
+is not in the training set). We will de ne the "weight" w(E) of a region E
+in the plane as
+w(E) =Z
+x2ED(x)dx;
+i.e., the probability that a random point sampled according to the distri-
+butionDwill fall into the region. Therefore, the error associated with the
+conceptR0is
+err(R0) =w(RR0) 74 The Formal (PAC) Learning Model
+Fig. 7.1. Given the tightest- t to positive examples strategy we have that R0R. The stripT1has weight =4 and the strip T0
+1is de ned as the upper strip covering
+the area between RandR0.
+and we wish to bound the error w(RR0)with probability of at least
+1after seeing mexamples. We will divide the region RR0into four strips T0
+1;:::;T0
+4(see Fig.7.1)
+which overlap at the corners. We will estimate prob(w(T0
+i)
+4) noting that
+the overlaps between the regions makes our estimates more pessimistic than
+they truly are (since we are counting the overlapping regions twice) thus
+making us lean towards the conservative side in our estimations. Consider the upper strip T0
+1. Ifw(T0
+1
+4) then we are done. We are
+however interested in quantifying the probability that this is not the case. Assumew(T0
+1)>
+4and de ne a strip T1which starts from the upper axis
+ofRand stretches to the extent such that w(T1) =
+4. ClearlyT1T0
+1. We
+have thatw(T0
+1)>
+4i T1T0
+1. Furthermore:
+Claim 9T1T0
+1i x1;:::;xm62T1. Proof: Ifxi2T1the the label must be positive since T1R. But if
+the label is positive then given our learning strategy of  tting the tightest
+rectangle over the positive examples, then xi2R0. SinceT16R0it follows
+thatxi62T1. We have therefore that w(T0
+1>
+4) i  no point in T1appears in the sample
+S=fx1;:::;xmg(otherwise T1intersects with R0and thusT0
+1T1). The
+probability that a point sampled according to the distribution Dwill fall
+outside ofT1is 1
+4. Given the independence assumption (examples are 7.3 Learnability of Finite Concept Classes 75
+drawn i.i.d.), we have:
+prob(x1;:::;xm62T1) =prob(w(T0
+1>
+4)) = (1
+4)m:
+Repeating the same analysis to regions T0
+2;T0
+3;T0
+4and using the union bound
+P(A[B)P(A) +P(B) we come to the conclusion that the probability
+that anyof the four strips of RR0has weight greater that =4 is at most
+4(1
+4)m. In other words,
+prob(err(L0))4((1
+4)m:
+We can make the expression more convenient for manipulation by using the
+inequalityex1x(recall that 1 + (1 =n))n< efrom which it follows
+that (1 +z)1=z< eand by taking the power of rzwherer0 we obtain
+(1 +z)r<erzthen setr= 1;z=x):
+4(1
+4)m4em
+4;
+from which we obtain the bound:
+m4
+ln4
+:
+To conclude, assuming that the learner adopts the tightest- t to positive ex-
+amples strategy and is given at least m0=4
+ln4
+training examples in order
+to  nd the axes-aligned rectangle R0, we can assert that with probability
+1the error associated with R0(i.e., the probability that an ( m+ 1)'th
+point will be classi ed incorrectly) is at most . We can see form the analysis above that indeed it applies to any distri-
+butionDwhere the only assumption we had to make is the independence
+of the draw. Also, the sample size mbehaves well in the sense that if one
+desires a higher level of accuracy (smaller ) or a higher level of con dence
+(smaller) then the sample size grows accordingly. The growth of mis
+linear in 1=and linear in ln(1 =).
+7.3 Learnability of Finite Concept Classes
+In the previous section we illustrated the concept of learnability with a
+particular simple example. We will now focus on applying the learnability
+model to a more general family of learning examples. We will consider the
+family of all learning problems over  nite concept classes jCj<1. For
+example, the conjunction learning problem (over boolean formulas) with n
+literals contains only 3nhypotheses because each variable can appear in
+the conjunction or not and if appears it could be negated or not. We have 76 The Formal (PAC) Learning Model
+shown that nis the lower bound on the number of mistakes on the worst
+case analysis any on-line algorithm can achieve. With the de nitions we
+have above on the formal model of learnability we can perform accuracy
+and sample complexity analysis that will apply to any learning problem
+over  nite concept classes. This was  rst introduced by Valiant in 1984. In the realizable case over jCj<1, we will show that any algorithm L
+which returns a hypothesis h2Cwhich is consistent with the training set
+Zis a learning algorithm forC. In other words, any  nite concept class
+is learnable and the learning algorithms simply need to generate consistent
+hypotheses. The sample complexity m0associated with the choice of and
+can be shown as equal to:1
+lnjCj
+. In the unrealizable case, any algorithm Lthat generates a hypothesis
+h2Cthat minimizes the empirical error (the error obtained on Z) is a
+learning algorithm for C. The sample complexity can be shown as equal to:
+2
+2ln2jCj
+. We will derive these two cases below.
+7.3.1 The Realizable Case
+Leth2Cbe some consistent hypothesis with the training set Z(we know
+that such a hypothesis exists, in particular h=ctthe target concept used
+for generating Z) and suppose that
+err(h) =prob[xD:h(x)6=ct(x)]>:
+Then, the probability (with respect to the product distribution Dm) thath
+agrees with cton a random sample of length mis at most (1)m. Using
+the inequality we saw before ex1xwe have:
+prob[err(h)>&&h(xi) =ct(xi); i= 1;:::;m ](1)m<em:
+We wish to bound the error uniformly , i.e., thaterr(h)for all concepts
+h2C. This requires the evaluation of:
+prob[max
+h2Cferr(h)>g&&h(xi) =ct(xi); i= 1;:::;m ]:
+There at mostjCjsuch functions h, therefore using the Union-Bound the
+probability that some function in Chas error larger than and is consistent 7.3 Learnability of Finite Concept Classes 77
+withcton a random sample of length mis at mostjCjem:
+prob[9h:err(h)>&&h(xi) =ct(xi); i= 1;:::;m ]
+X
+h:err(h)>prob[h(xi) =ct(xi); i= 1;:::;m ]
+jh:err(h)>jem
+jCjem
+For any positive , this probability is less than provided:
+m1
+lnjCj
+:
+This derivation can be summarized in the following theorem (Anthony &
+Bartlett [1], pp. 25):
+Theorem 5 LetCbe a  nite set of functions from XtoY. LetLbe
+an algorithm such that for any mand for any ct2C, ifZis a training
+samplef(xi;ct(xi))g,i= 1;:::;m , then the hypothesis h=L(Z)satis es
+h(xi) =ct(xi). ThenLis a learning algorithm for Cin the realizable case
+with sample complexity
+m0=1
+lnjCj
+:
+7.3.2 The Unrealizable Case
+In the realizable case an algorithm simply needs to generate a consistent
+hypothesize to be considered a learning algorithm in the formal sense. In
+the unrealizable situation (a target function ctmight not exist) an algorithm
+which minimizes the empirical error, i.e., an algorithm Lgeneratesh=L(Z)
+having minimal sample error:
+^err(L(Z)) = min
+h2C^err(h)
+is a learning algorithm for C(assuming  nitejCj). This is a particularly
+useful property given that the true errors of the functions in Care un-
+known. It seems natural to use the sample errors ^ err(h) as estimates to the
+performance of L. The fact that given a large enough sample (training set Z) then the sam-
+ple error ^err(h) becomes close to the true error err(h) is somewhat of a
+restatement of the "law of large numbers" of probability theory. For ex-
+ample, if we toss a coin many times then the relative frequency of 'heads'
+approaches the true probability of 'head' at a rate determined by the law of 78 The Formal (PAC) Learning Model
+large numbers. We can bound the probability that the di erence between
+the empirical error and the true error of some hexceedsusing Hoe ding's
+inequality:
+Claim 10 Lethbe some function from XtoY=f0;1g. Then
+prob[j^err(h)err(h)j]2e(22m);
+for any probability distribution D, any>0and any positive integer m. Proof: This is a straightforward application of Hoe ding's inequality to
+Bernoulli variables. Hoe ding's inequality says: Let Xbe a set,Da proba-
+bility distribution on X, andf1;:::;fmreal-valued functions fi:X![ai;bi]
+fromXto an interval on the real line ( ai<bi). Then,
+prob"
+j1
+mmX
+i=1fi(xi)ExD[f(x)]j#
+2e22m2
+P
+i(biai)2(7.1)
+where
+ExD[f(x)] =1
+mmX
+i=1Z
+fi(x)D(x)dx:
+In our case fi(xi) = 1 i h(xi)6=yiandai= 0;bi= 1. Therefore
+(1=m)P
+ifi(xi) = ^err(h) anderr(h) =ExD[f(x)]. The Hoe ding bound almost does what we need, but not quite so. What
+we have is that for any given hypothesis h2C, the empirical error is
+close to the true error with high probability. Recall that our goal is to
+minimizeerr(h) over all possible h2Cbut we can access only ^ err(h). If
+we can guarantee that the two are close to each other for everyh2C, then
+minimizing ^ err(h) over allh2Cwill approximately minimize err(h). Put
+formally, in order to ensure that Llearns the class C, we must show that
+prob
+max
+h2Cj^err(h)err(h)j<
+>1
+In other words, we need to show that the empirical errors converge (at high
+probability) to the true errors uniformly overCasm!1 . If that can be
+guaranteed, then with (high) probability 1 , for everyh2C,
+err(h)< ^err(h)<err (h) +:
+So, since the algorithm Lrunning on training set Zreturnsh=L(Z) which
+minimizes the empirical error, we have:
+err(L(Z))^err(L(Z)) += min
+h^err(h) +Opt(C) + 2; 7.3 Learnability of Finite Concept Classes 79
+which is what is needed in order that LlearnsC. Thus, what is left is to
+prove the following claim:
+Claim 11
+prob
+max
+h2Cj^err(h)err(h)j
+2jCje22m
+Proof: We will use the union bound. Finding the maximum over Cis
+equivalent to taking the union of all the events:
+prob
+max
+h2Cj^err(h)err(h)j
+=prob"[
+h2CfZ:j^err(h)err(h)jg#
+;
+using the union-bound and Claim 2, we have:
+X
+h2Cprob[j^err(h)err(h)j]jCj2e(22m):
+Finally, given that 2 jCje22mwe obtain the sample complexity:
+m0=2
+2ln2jCj
+:
+This discussion is summarized with the following theorem (Anthony & Bartlett
+[1], pp. 21):
+Theorem 6 LetCbe a  nite set of functions from XtoY=f0;1g. LetL
+be an algorithm such that for any mand for any training set Z=f(xi;yi)g,
+i= 1;:::;m , then the hypothesis L(Z)satis es:
+^err(L(Z)) = min
+h2C^err(h):
+ThenLis a learning algorithm for Cwith sample complexity m0=2
+2ln2jCj
+. Note that the main di erence with the realizable case (Theorem 1) is the
+larger 1=2rather than 1 =. The realizable case requires a smaller training
+set since we are estimating a random quantity so the smaller the variance
+the less data we need. 8
+The VC Dimension
+The result of the PAC model (also known as the "formal" learning model)
+is that if the concept class Cis PAC-learnable then the learning strategy
+must simply consist of gathering a suciently large training sample Sof
+sizem > mo(;), for given accuracy  > 0 and con dence 0 <  < 1
+parameters, and  nds a hypothesis h2Cwhich is consistent with S. The
+learning algorithm is then guaranteed to have a bounded error err(h)< 
+with probability 1 . The error measurement includes data not seen by
+the training phase. This state of a air also holds (with some slight modi cations on the sam-
+ple complexity bounds) when there is no consistent hypothesis (the unreal-
+izable case). In this case the learner simply needs to minimize the empirical
+error ^err(h) on the sample training data S, and ifmis suciently large
+then the learner is guaranteed to have err(h)<Opt (C) +with probability
+1. The measure Opt(C) is de ned as the minimal err(g) over allg2C. Note that in the realizable case Opt(C) = 0. The property of bounding the true error err(h) by minimizing the sample
+error ^err(h) is very convenient. The fundamental question is under what
+conditions this type of generalization property applies? We saw in the previ-
+ous lecture that a satisfactorily answer can be provided when the cardinality
+of the concept space is bounded, i.e. jCj<1, which happens for Boolean
+concept space for example. In that lecture we have proven that:
+mo(;) =O(1
+lnjCj
+);
+is sucient for guaranteeing a learning model in the formal sense, i.e., which
+has the generalization property described above. In this lecture and the one that follows we have two goals in mind. First
+is to generalize the result of  nite concept class cardinality to in nite car-
+80 8.1 The VC Dimension 81
+dinality | note that the bound above is not meaningful when jCj=1. Can we learn in the formal sense any non-trivial in nite concept class? (we
+already saw an example of a PAC-learnable in nite concept class which is
+the class of axes aligned rectangles). In order to answer this question we will
+need to a general measure of concept class complexity which will replace the
+cardinality termjCjin the sample complexity bound mo(;). It is tempting
+to assume that the number of parameters which fully describe the concepts
+ofCcan serve as such a measure, but we will show that in fact one needs
+a more powerful measure called the Vapnik-Chervonenkis (VC) dimension. Our second goal is to pave the way and provide the theoretical foundation
+for the large margin principle algorithm (SVM) we derived in Lecture 4.
+8.1 The VC Dimension
+The basic principle behind the VC dimension measure is that although C
+may have in nite cardinality, the restriction of the application of concepts
+inCto a  nite sample Shas a  nite outcome. This outcome is typically
+governed by an exponential growth with the size mof the sample S| but
+not always. The point at which the growth stops being exponential is when
+the "complexity" of the concept class Chas exhausted itself, in a manner
+of speaking. We will assume Cis a concept class over the instance space X| both
+of which can be in nite. We also assume that the concept class maps in-
+stances inXtof0;1g, i.e., the input instances are mapped to "positive"
+or "negative" labels. A training sample Sis drawn i.i.d according to some
+ xed but unknown distribution DandSconsists ofminstances x1;:::;xm. In our notations we will try to reserve c2Cto denote the target concept
+andh2Cto denote some concept. We begin with the following de nition:
+De nition 2
+C(S) =f(h(x1);:::;h (xm) :h2Cg
+which is a set of vectors in f0;1gm. C(S) is set whose members are m-dimensional Boolean vectors induced by
+functions of C. These members are often called dichotomies or behaviors on
+Sinduced or realized by C. IfCmakes a full realization then  C(S) will
+have 2mmembers. An equivalent description is a collection of subsets of S:
+C(S) =fh\S:h2Cg
+where each h2Cmakes a partition of Sinto two sets | the positive and 82 The VC Dimension
+negative points. The set  C(S) contains therefore subsets of S(the positive
+points ofSunderh). A full realization will providePm
+i=0m
+i
+= 2m. We
+will use both descriptions of  C(S) as a collection of subsets of Sand as a
+set of vectors interchangeably. De nition 3 IfjC(S)j= 2mthenSis considered shattered byC. In
+other words, Sis shattered by CifCrealizes all possible dichotomies of S. Consider as an example a  nite concept class C=fc1;:::;c 4gapplied to
+three instance vectors with the results:
+x1x2x3
+c11 1 1
+c20 1 1
+c31 0 0
+c40 0 0
+Then,
+C(fx1g) =f(0);(1)g shattered
+C(fx1;x3g) =f(0;0);(0;1);(1;0);(1;1)gshattered
+C(fx2;x3g) =f(0;0);(1;1)g not shattered
+With these de nitions we are ready to describe the measure of concept class
+complexity. De nition 4 (VC dimension) The VC dimension of C, noted asVCdim (C),
+is the cardinality dof the largest set Sshattered by C. If all sets S(arbi-
+trarily large) can be shattered by C, thenVCdim (C) =1. VCdim (C) = maxfdj9jSj=d; andjC(S)j= 2dg
+The VC dimension of a class of functions Cis the point dat which all
+samplesSwith cardinalityjSj>dareno longer shattered byC. As long as
+CshattersSit manifests its full "richness" in the sense that one can obtain
+fromSall possible results (dichotomies). Once that ceases to hold, i.e.,
+whenjSj> d, it means that Chas "exhausted" its richness (complexity). An in nite VC dimension means that Cmaintains full richness for all sample
+sizes. Therefore, the VC dimension is a combinatorial measure of a function
+class complexity. Before we consider a number of examples of geometric concept classes
+and their VC dimension, it is important clarify the lower and upper bounds
+(existential and universal quanti ers) in the de nition of VC dimension. The VC dimension is at least dif there exists some samplejSj=dwhich is 8.1 The VC Dimension 83
+shattered by C| this does not mean that all samples of size dare shattered
+byC. Conversely, in order to show that the VC dimension is at mostd,
+one must show that no sample of size d+ 1 is shattered. Naturally, proving
+an upper bound is more dicult than proving the lower bound on the VC
+dimension. The following examples are shown in a "hand waiving" style
+and are not meant to form rigorous proofs of the stated bounds | they are
+shown for illustrative purposes only. Intervals of the real line: The concept class Cis governed by two param-
+eters 1; 2in the closed interval [0 ;1]. A concept from this class will tag an
+input instance 0 <x< 1 as positive if  1x 2and negative otherwise. The VC dimension is at least 2: select a sample of 2 points x1;x2positioned
+in the open interval (0 ;1). We need to show that there are values of  1; 2
+which realize all the possible four dichotomies (+ ;+);(;);(+;);(;+). This is clearly possible as one can place the interval [  1; 2] such the inter-
+section with the interval [ x1;x2] is null, (thus producing ( ;)), or to fully
+include [x1;x2] (thus producing (+ ;+)) or to partially intersect [ x1;x2] such
+thatx1orx2are excluded (thus producing the remaining two dichotomies). To show that the VC dimension is at most 2, we need to show that any
+sample of three points x1;x2;x3on the line (0 ;1) cannot be shattered. It is
+sucient to show that one of the dichotomies is not realizable: the labeling
+(+;;+) cannot be realizable by any interval [  1; 2] | this is because if
+x1;x3are labeled positive then by de nition the interval [  1; 2] must fully
+include the interval [ x1;x3] and since x1<x 2<x 3thenx2must be labeled
+positive as well. Thus VCdim (C) = 2. Axes-aligned rectangles in the plane: We have seen this concept class
+in the previous lecture | a point in the plane is labeled positive if it lies
+in an axes-aligned rectangle. The concept class Cis thus governed by 4
+parameters. The VC dimension is at least 4: consider a con guration of
+4 input points arranged in a cross pattern (recall that we need only to
+show some sampleSthat can be shattered). We can place the rectangles
+(concepts of the class C) such that all 16 dichotomies can be realized (for
+example, placing the rectangle to include the vertical pair of points and
+exclude the horizontal pair of points would induce the labeling (+ ;;+;)). It is important to note that in this case, not all con gurations of 4 points
+can be shattered | but to prove a lower bound it is sucient to show
+the existence of a single shattered set of 4 points. To show that the VC
+dimension is at most 4, we need to prove that any set of 5 points cannot 84 The VC Dimension
+be shattered. For any set of 5 points there must be some point that is
+"internal", i.e., is neither the extreme left, right, top or bottom point of the
+ ve. If we label this internal point as negative and the remaining 4 points as
+positive then there is no axes-aligned rectangle (concept) which cold realize
+this labeling (because if the external 4 points are labeled positive then they
+must be fully within the concept rectangle, but then the internal point must
+also be included in the rectangle and thus labeled positive as well). Separating hyperplanes: Consider  rst linear half spaces in the plane. The lower bound on the VC dimension is 3 since any three (non-collinear)
+points inR2can be shattered, i.e., all 8 possible labelings of the three points
+can be realized by placing a separating line appropriately. By having one
+of the points on one side of the line and the other two on the other side we
+can realize 3 dichotomies and by placing the line such that all three points
+are on the same side will realize the 4th. The remaining 4 dichotomies are
+realized by a sign  ip of the four previous cases. To show that the upper
+bound is also 3, we need to show that no set of 4 points can be shattered. We consider two cases: (i) the four points form a convex region, i.e., lie on
+the convex hull de ned by the 4 points, (ii) three of the 4 points de ne the
+convex hull and the 4th point is internal. In the  rst case, the labeling which
+is positive for one diagonal pair and negative to the other pair cannot be
+realized by a separating line. In the second case, a labeling which is positive
+for the three hull points and negative for the interior point cannot be realize. Thus, the VC dimension is 3 and in general the VC dimension for separating
+hyperplanes in Rnisn+ 1. Union of a  nite number of intervals on the line: This is an example
+of a concept class with an in nite VC dimension. For any sample of points
+on the line, one can place a sucient number of intervals to realize any
+labeling. The examples so far were simple enough that one might get the wrong
+impression that there is a correlation between the number of parameters
+required to describe concepts of the class and the VC dimension. As a
+counter example, consider the two parameter concept class:
+C=fsign(sin(!x+) :!g
+which has an in nite VC dimension as one can show that for every set
+ofmpoints on the line one can realize all possible labelings by choosing 8.2 The Relation between VC dimension and PAC Learning 85
+a suciently large value of !(which serves as the frequency of the sync
+function) and appropriate phase. We conclude this section with the following claim:
+Theorem 7 The VC dimension of a  nite concept class jCj<1is bounded
+from above:
+VCdim (C)log2jCj:
+Proof: ifVCdim (C) =dthen there exists at least 2dfunctions in C
+because every function induces a labeling and there are at least 2dlabelings. Thus, fromjCj2dfollows that dlog2jCj.
+8.2 The Relation between VC dimension and PAC Learning
+We saw that the VC dimension is a combinatorial measure of concept class
+complexity and we would like to have it replace the cardinality term in the
+sample complexity bound. The  rst result of interest is to show that if
+the VC dimension of the concept class is in nite then the class is not PAC
+learnable. Theorem 8 Concept class CwithVCdim (C) =1is not learnable in the
+formal sense. Proof: Assume the contrary that Cis PAC learnable. Let Lbe the learning
+algorithm and mbe the number of training examples required to learn the
+concept class with accuracy = 0:1 and 1= 0:9. That is, after seeing
+at leastm(;) training examples, the learner generates a concept hwhich
+satis esp(err(h)0:1)0:9. Since the VC dimension is in nite there exist a sample set Swith 2m
+instances which is shattered by C. Since the formal model (PAC) applies
+to any training sample we will use the set Sas follows. We will de ne a
+probability distribution on the instance space Xwhich is uniform on S(with
+probability1
+2m) and zero everywhere else. BecauseSis shattered, then any target concept is possible so we will
+choose our target concept cin the following manner:
+prob(ct(xi) = 0) =1
+28xi2S;
+in other words, the labels ct(xi) are determined by a coin  ip. The learner
+Lselects an i.i.d. sample of minstances S| which due to the structure of 86 The VC Dimension
+Dmeans that the SSand outputs a consistent hypothesis h2C. The
+probability of error for each xi62Sis:
+prob(ct(xi)6=h(xi)) =1
+2:
+The reason for that is because Sis shattered by C, i.e., we can select any
+target concept for any labeling of S(the 2mexamples) therefore we could
+select the labels of the mpoints not seen by the learner arbitrarily (by
+ ipping a coin). Regardless of h, the probability of mistake is 0 :5. The
+expectation on the error of his:
+E[err(h)] =m01
+2m+m1
+21
+2m=1
+4:
+This is because we have 2 mpoints to sample (according to Das all other
+points have zero probability) from which the error on half of them is zero
+(ashis consistent on the training set S) and the error on the remaining half
+is 0:5. Thus, the average error is 0 :25. Note that E[err(h)] = 0:25 for any
+choice of;as it is based on the sample size m. For any sample size mwe
+can follow the construction above and generate the learning problem such
+that if the learner produces a consistent hypothesis the expectation of the
+error will be 0 :25. The result that E[err(h)] = 0:25 is not possible for the accuracy and
+con dence values we have set: with probability of at least 0 :9 we have that
+err(h)0:1 and with probability 0 :1 thenerr(h) = where 0:1<  1. Taking the worst case of  = 1 we come up with the average error:
+E[err(h)]0:90:1 + 0:11 = 0:19<0:25:
+We have therefore arrived to a contradiction that Cis PAC learnable. We next obtain a bound on the growth of jS(C)jwhen the sample size
+jSj=mis much larger than the VC dimension VCdim (C) =dof the
+concept class. We will need few more de nitions:
+De nition 5 (Growth function)
+C(m) = maxfjS(C)j:jSj=mg
+The measure  C(m) is the maximum number of dichotomies induced by C
+for samples of size m. As long as mdthen C(m) = 2m. The question
+is what happens to the growth pattern of  C(m) whenm > d . We will
+see that the growth becomes polynomial | a fact which is crucial for the
+learnability of C. 8.2 The Relation between VC dimension and PAC Learning 87
+De nition 6 For any natural numbers m;d we have the following de nition:
+d(m) = d(m1) + d1(m1)
+d(0) =  0(m) = 1
+By induction on m;d it is possible to prove the following:
+Theorem 9
+d(m) =dX
+i=0m
+i
+Proof: by induction on m;d. For details see [[3], pp. 56]. Formdwe have that  d(m) = 2m. Form > d we can derive a
+polynomial upper bound as follows.
+d
+mddX
+i=0m
+i
+dX
+i=0d
+mim
+i
+mX
+i=0d
+mim
+i
+= (1 +d
+m)med
+From which we obtain:d
+md
+d(m)ed:
+Dividing both sides byd
+mdyields:
+d(m)edm
+dd
+=em
+dd
+=O(md):
+We need one more result before we are ready to present the main result of
+this lecture:
+Theorem 10 (Sauer's lemma) IfVCdim (C) =d, then for any m,
+C(m)d(m). Proof: By induction on both d;m. For details see [[3], pp. 55{56]. Taken together, we have now a fairly interesting characterization on how
+the combinatorial measure of complexity of the concept class Cscales up
+with the sample size m. When the VC dimension of Cis in nite the growth
+is exponential, i.e.,  C(m) = 2mfor all values of m. On the other hand,
+when the concept class has a bounded VC dimension VCdim (C) =d<1
+then the growth pattern undergoes a discontinuity from an exponential to
+a polynomial growth:
+C(m) =(
+2mmd
+em
+ddm>d) 88 The VC Dimension
+As a direct result of this observation, when m>>d is much larger than d
+the entropy becomes much smaller than m. Recall than from an informa-
+tion theoretic perspective, the entropy of a random variable Zwith discrete
+valuesz1;:::;znwith probabilities pi,i= 1;:::;n is de ned as:
+H(Z) =nX
+i=0pilog21
+pi;
+whereI(pi) = log21
+piis a measure of "information", i.e., is large when
+piis small (meaning that there is much information in the occurrence of
+an unlikely event) and vanishes when the event is certain pi= 1. The
+entropy is therefore the expectation of information. Entropy is maximal for
+a uniform distribution H(Z) = log2n. The entropy in information theory
+context can be viewed as the number of bits required for coding z1;:::;zn. In
+coding theory it can be shown that the entropy of a distribution provides the
+lower bound on the average length of any possible encoding of a uniquely
+decodable code fro which one symbol goes into one symbol. When the
+distribution is uniform we will need the maximal number of bits, i.e., one
+cannot compress the data. In the case of concept class Cwith VC dimension
+d, we see that one when mdall possible dichotomies are realized and
+thus one will need mbits (as there are 2mdichotomies) for representing
+all the outcomes of the sample. However, when m >> d only a small
+fraction of the 2mdichotomies can be realized, therefore the distribution
+of outcomes is highly non-uniform and thus one would need much less bits
+for coding the outcomes of the sample. The technical results which follow
+are therefore a formal way of expressing in a rigorous manner this simple
+truth | If it is possible to compress, then it is possible to learn . The crucial
+point is that learnability is a direct consequence of the "phase transition"
+(from exponential to polynomial) in the growth of the number of dichotomies
+realized by the concept class. In the next lecture we will continue to prove the "double sampling" the-
+orem which derives the sample size complexity as a function of the VC
+dimension. 9
+The Double-Sampling Theorem
+In this lecture will use the measure of VC dimension, which is a combina-
+torial measure of concept class complexity, to bound the sample size com-
+plexity.
+9.1 A Polynomial Bound on the Sample Size mfor PAC Learning
+In this section we will follow the material presented in Kearns & Vazirani
+[3] pp. 57{61 and prove the following:
+Theorem 11 (Double Sampling) LetCbe any concept class of VC di-
+mensiond. LetLbe any algorithm that when given a set Sofmlabeled
+examplesfxi;c(xi)gi, sampled i.i.d according to some  xed but unknown
+distribution Dover the instance space X, of some concept c2C, produces
+as output a concept h2Cthat is consistent with S. ThenLis a learning
+algorithm in the formal sense provided that the sample size obeys:
+mc01
+log1
++d
+log1
+
+for some constant c0>0. The idea behind the proof is to build an "approximate" concept space which
+includes concepts arranged such that the distance between the approximate
+conceptshand the target concept cis at least| where distance is de-
+ ned as the weight of the region in Xwhich is in con ict with the target
+concept. To formalize this story we will need few more de nitions. Unless
+speci ed otherwise, c2Cdenotes the target concept and h2Cdenotes
+some concept.
+89 90 The Double-Sampling Theorem
+De nition 7
+ch=hc=fx:c(x)6=h(x)g
+chis the region in instance space where both concepts do not agree |
+the error region. The probability that x2chis equal to (by de nition)
+err(h). De nition 8
+(c) =fhc:h2Cg
+(c) =fhc:h2C and err (h)g
+(c) is a set of error regions, one per concept h2Cover all concepts. The
+error regions are with respect to the target concept. The set  (c)(c)
+is the set of all error regions whose weight exceeds . Recall that weight is
+de ned as the probability that a point sampled according to Dwill hit the
+region. It will be important for later to evaluate the VC dimension of ( c). Unlike
+C, we are not looking for the VC dimension of a class of function but the
+VC dimension of a set of regions in space. Recall the de nition of  C(S)
+from the previous lecture: there were two equivalent de nitions one based
+on a set of vectors each representing a labeling of the instances of Sinduced
+by some concept. The second, yet equivalent, de nition is based on a set
+of subsets of Seach induced by some concept (where the concept divides
+the sample points of Sinto positive and negative labeled points). So far it
+was convenient to work with the  rst de nition, but for evaluating the VC
+dimension of ( c) it will be useful to consider the second de nition:
+(c)(S) =fr\S:r2(c)g;
+that is, the collection of subsets of Sinduced by intersections with regions
+of (c). An intersection between Sand a region ris de ned as the subset of
+points from Sthat fall into r. We can easily show that the VC dimensions
+ofCand (c) are equal:
+Lemma 1
+VCdim (C) =VCdim ((c)):
+Proof: we have that the elements of  C(S) and  (c)(S) are susbsets of
+S, thus we need to show that for every Sthe cardinality of both sets is
+equaljC(S)j=j(c)(S)j. To do that it is sucient to show that for every
+elements2C(S) there is a unique corresponding element in  (c)(S). Let 9.1 A Polynomial Bound on the Sample Size mfor PAC Learning 91
+c\Sbe the subset of Sinduced by the target concept c. The sets(a subset
+ofS) is realized by some concept h(those points in Swhich were labeled
+positive by h). Therefore, the set s\(c\S) is the subset of Scontaining
+the points that hit the region hcwhich is an element of  (c)(S). Since
+this is a one-to-one mapping we have that jC(S)j=j(c)(S)j. De nition 9 ( -net) For every>0, a sample set Sis an-net for (c)
+if every region in (c)is hit by at least one point of S:
+8r2(c); S\r6=;:
+In other words, if Shits all the error regions in ( c) whose weight exceeds
+, thenSis an-net. Consider as an example the concept class of intervals
+on the line [0 ;1]. A concept is de ned by an interval [  1; 2] such that all
+points inside the interval are positive and all those outside are negative. Givenc2Cis the target concept and h2Cis some concept, then the
+error region hcis the union of two intervals: I1consists of all points x2h
+which are not in c, andI2the interval of all points x2cbut which are not
+inh. Assume that the distribution Dis uniform (just for the sake of this
+example) then, prob(x2I) =jIjwhich is the length of the interval I. As a
+result,err(h)>if eitherjI1j>=2 orjI2j>=2. The sample set
+S=fx=k
+2:k= 0;1;:::;2=g
+contains sample points from 0 to 1 with increments of =2. Therefore, every
+interval larger than must be hit by at least one point from Sand by
+de nitionSis an-net. It is important to note that if Sforms an-net then we are guaranteed
+thaterr(h). Leth2Cbe the consistent hypothesis with S(returned
+by the learning algorithm L). Becuase his consistent, hc2(c) has
+not been hit by S(recall that hcis the error region with respect to the
+target concept c, thus ifhis consistent then it agrees with coverSand
+thereforeSdoes not hit hc). SinceSforms an-net for ( c) we must
+havehc62(c) (recall that by de nition Shits all error regions with
+weight larger than ). As a result, the error region hcmust have a weight
+smaller than which means that err(h). The conclusion is that if we can bound the probability that a random sam-
+pleSdoes not form an-net for (c), then we have bounded the probability
+that a concept hconsistent with Shaserr(h)> . This is the goal of the
+proof of the double-sampling theorem which we are about to prove below: 92 The Double-Sampling Theorem
+Proof (following Kearns & Vazirani [3] pp. 59{61): LetS1be a ran-
+dom sample of size m(sampled i.i.d. according to the unknown distribution
+D) and letAbe the event that S1does not form an-net for ( c). From
+the preceding discussion our goal is to upper bound the probability for Ato
+occur, i.e.,prob(A). IfAoccurs, i.e., S1is not an-net, then by de nition there must be some
+regionr2(c) which is not hit by S1, that isS1\r=;. Note that
+r=h(c) for some concept hwhich is consistent with S1. At this point the
+space of possibilities is in nite, because the probability that we fail to hit
+h(c) inmrandom examples is at most (1 )m. Thus the probability that
+we fail to hit somehc2(c) is bounded from above by j(c)j(1)m
+| which does not help us due to the fact that j(c)jis in nite. The idea
+of the proof is to turn this into a  nite space by using another sample, as
+follows. LetS2be another random sample of size m. We will select m(for both
+S1andS2) to guarantee a high probability that S2will hitrmany times. In fact we wish that S2will hitrat leastm
+2with probability of at least 0 :5:
+prob(jS2\rj>m
+2) = 1prob(jS2\rjm
+2):
+We will use the Cherno  bound (lower tail) to obtain a bound on the right-
+hand side term. Recall that if we have mBernoulli trials (coin tosses)
+Z1;:::;Zmwith expectation E(Zi) =pand we consider the random variable
+Z=Z1+:::+Zmwith expectation E(Z) =(note that=pm) then for
+all 0< < 1 we have:
+prob(Z < (1 ))e 2
+2:
+Considering the sampling of mexamples that form S2as Bernoulli trials,
+we have that m(since the probability that an example will hit ris at
+least) and = 0:5. We obtain therefore:
+prob(jS2\rj(11
+2)m)em
+8=1
+2
+which happens when m=8
+ln 2 =O(1
+). To summarize what we have
+obtained so far, we have calculated the probability that S2will hitrmany
+times given thatrwas  xed using the previous sampling, i.e., given that S1
+does not form an -net. To formalize this, let Bdenote the combined event
+thatS1does not form an -event and S2hitsrat leastm=2 times. Then,
+we have shown that for m=O(1=) we have:
+prob(B=A)1
+2: 9.1 A Polynomial Bound on the Sample Size mfor PAC Learning 93
+From this we can calculate prob(B):
+prob(B) =prob(B=A)prob(A)1
+2prob(A);
+which means that our original goal of bounding prob(A) is equivalent to
+ nding a bound prob(B)=2 becauseprob(A)2prob(B). The
+crucial point with the new goal is that to analyze the probability of the
+eventB, we need only to consider a  nite number of possibilities, namely to
+consider the regions of
+(c)(S1[S2) =fr\fS1[S2g:r2(c)g:
+This is because the occurrence of the event Bis equivalent to saying that
+there is some r2(c)(S1[S2) such thatjrjm=2 (i.e., the region r
+is hit at least m=2 times) and S1\r=;. This is because  (c)(S1[S2)
+contains all the subsets of S1[S2realized as intersections over all regions
+in (c). Thus even though we have an in nite number of regions we still
+have a  nite number of subsets. We wish therefore to analyze the following
+probability:
+prob
+r2(c)(S1[S2) :jrjm=2and S 1\r=;
+:
+LetS=S1[S2a random sample of 2 m(note that since the sampling is i.i.d.
+it is equivalent to sampling S1andS2separately) and rsatisfyingjrjm=2
+being  xed. Consider some random partitioning of SintoS1andS2and
+consider then the problem of estimating the probability that S1\r=;. This problem is equivalent to the following combinatorial question: we have
+2mballs, each colored Red or Blue, with exaclty lm=2 Red balls. We
+divide the 2 mballs into groups of equal size S1andS2and we are interested
+in bounding the probability that all of the lballs fall in S2(that is, the
+probability that S1\r=;). This in turn is equivalent to  rst dividing the
+2muncolored balls into S1andS2groups and then randomly choose lof
+the balls to be colored Red and analyze the probability that all of the Red
+balls fall into S2. This probability is exactly
+m
+l
+2m
+l=l1Y
+i=0mi
+2mil1Y
+i=01
+2=1
+2l= 2m=2:
+This probability was evaluated for a  xedSandr. Thus, the probability that
+this occurs for somer2(c)(S) satisfyingjrjm=2 (which is prob(B))
+can be calculated by summing over all possible  xed rand applying the 94 The Double-Sampling Theorem
+union bound prob(P
+iZi)P
+iprob(Zi):
+prob(B) j(c)(S)j2m=2j(c)(S)j2m=2
+=jC(S)j2m=22m
+dd
+2m=2
+2;
+from which it follows that:
+m=O1
+log1
++d
+log1
+
+:
+Few comments are worthwhile at this point:
+(i) It is possible to show that the upper bound on the sample complexity
+mis tight by showing that the lower bound on mis 
+(d=) (see [[3],
+pp. 62]).
+(ii) The treatment above holds also for the unrealizable case (target con-
+ceptc62C) with slight modi cations to the bound. In this context,
+the learning algorithm Lmust simply minimize the sample (empiri-
+cal) error ^err(h) de ned:
+^err(h) =1
+mjfi:h(xi)6=yigjxi2S:
+The generalization of the double-sampling theorem (Derroye'82) states
+that the empirical errors converge uniformly to the true errors:
+prob
+max
+h2Cj^err(h)err(h)j
+4e(4+42)m2
+dd
+2m2=2;
+from which it follows that
+m=O1
+2log1
++d
+2log1
+
+:
+Taken together, we have arrived to a fairly remarkable result. Despite the
+fact that the distribution Dfrom which the training sample Sis drawn from
+isunknown (but is known to be  xed), the learner simply needs to minimize
+the empirical error. If the sample size mis large enough the learner is guar-
+anteed to have minimized the true errors for some accuracy and con dence
+parameters which de ne the sample size complexity. Equivalently,
+jOpt(C)^err(h)j!m!10:
+Not only is the convergence is independent of Dbut also the rate of con-
+vergence is independent (namely, it does not matter where the optimal h 9.2 Optimality of SVM Revisited 95
+is located). The latter is very important because without it one could ar-
+bitrarily slow down the convergence rate by maliciously choosing D. The
+beauty of the results above is that Ddoes not have an e ect at all | one
+simply needs to choose the sample size to be large enough for the accuracy,
+con dence and VC dimension of the concept class to be learned over.
+9.2 Optimality of SVM Revisited
+In Lecture 4 we discussed the large margin principle for  nding an optimal
+separating hyperplane. It is natural to ask how does the PAC theory pre-
+sented so far explains why a maximal margin hyperplane is optimal with
+regard to the formal sense of learning (i.e. to generalization from empirical
+errors to true errors)? We saw in the previous section that the sample com-
+plexitym(;;d ) depends also on the VC dimension of the concept class |
+which isn+ 1 for hyperplanes in Rn. Thus, another natural question that
+may certainly arise is what is the gain in employing the "kernel trick"? For a
+ xedm, mapping the input instance space Xof dimension nto some higher
+(exponentially higher) feature space might simply mean that we are compro-
+mising the accuracy and con dence of the learner (since the VC dimension
+is equal to the instance space dimension plus 1). Given a  xed sample size m, the best the learner can do is to minimize the
+empirical error and at the same time to try to minimize the VC dimension d
+of the concept class . The smaller dis, for a  xed m, the higher the accuracy
+and con dence of the learning algorithm. Likewise, the smaller dis, for a
+ xed accuracy and con dence values, the smaller sample size is required. There are two possible ways to decrease d. First is to decrease the dimen-
+sionnof the instance space X. This amounts to "feature selection", namely
+ nd a subset of coordinates that are the most "relevant" to the learning
+task r perform a dimensionality reduction via PCA, for example. A second
+approach is to maximize the margin. Let the margin associated with the
+separating hyperplane h(i.e. consistent with the sample S) be . Let the
+input vectors x2Xhave a bounded norm, jxjR. It can be shown that
+the VC dimension of the concept class C of hyperplanes with margin  is:
+C = minR2
+ 2;n
++ 1:
+Thus, if the margin is very small then the VC dimension remains n+ 1. As
+the margin gets larger, there comes a point where R2= 2<nand as a result
+the VC dimension decreases. Moreover, mapping the instance space Xto
+some higher dimension feature space will not change the VC dimension as 96 The Double-Sampling Theorem
+long as the margin remains the same. It is expected that the margin will not
+scale down or will not scale down as rapidly as the scaling up of dimension
+from image space to feature space. To conclude, maximizing the margin (while minimizing the empirical er-
+ror) is advantageous as it decreases the VC dimension of the concept class
+and causes the accuracy and con dence values of the learner to be largely
+immune to dimension scaling up while employing the kernel trick. 10
+Appendix
+97 98 Appendix
+A0.1 Variance, Covariance, etc. LetX;Y be two random variables and let f(x;y) be some function on x2
+X;y2Y, and letp(x;y) be the probability of the event xandyoccurring
+together. The expectation E[f(x;y)] is de ned:
+E[f(x;y)] =X
+x2XX
+y2Yf(x;y)p(x;y)
+. The mean, variance and covariance are de ned:
+x=E[X] =X
+xX
+yxp(x;y)
+y=E[Y] =X
+xX
+yyp(x;y)
+2
+x=Var[X] =E[(xx)2] =X
+xX
+y(xx)2p(x;y)
+2
+y=Var[Y] =E[(yy)2] =X
+xX
+y(yy)2p(x;y)
+xy=Cov(XY) =E[(xx)(yy)] =X
+xX
+y(xx)(yy)p(x;y)
+In vector-matrix notation, let xrepresent the nrandom variables of X1;:::;Xn,
+i.e.,x= (x1;:::;xn)>is an instance vector and p(x) is the probability of the
+instance occurrence. Then the mean is a vector and the covariance matrix
+Eare de ned:
+=X
+x2fX1;:::;Xngxp(x)
+E=X
+x(x)(x)>p(x)
+Note that the covariance matrix Eis the linear superposition of rank-1
+matrices ( x)(x)>with coecients p(x). The diagonal of Econtaines
+the variances of the variables x1;:::;xn. For a uniform distribution and
+a sample data Sconsisting of mpoints, let A= [x1;:::;xm] be
+the matrix whose columns consist of the points centered around the mean:
+=1
+mP
+ixi. The (sample) covariance matrix is E=1
+mAA>. A0.2 Derivatives of Matrix Operations: Scalar Functions of a Vector 99
+A0.2 Derivatives of Matrix Operations: Scalar Functions of a
+Vector
+The two most important examples of a scalar function of a vector xare the
+linear form a>xand the quadratic form x>Axfor some square matrix A.
+d(a>x) = a>dx
+d(x>Ax) = (dx)>Ax+x>A(dx)
+=
+(dx)>Ax>
++x>A(dx)
+=x>(A+A>)dx
+where the derivative d(x>Ax) using the rule of products d(fg) = (df)g+
+f(dg) whereg=Axandf=x>and noting that d(Ax) =Adx. Thus,
+d
+dx(a>x) =a>andd
+dx(x>Ax)) = x>(A+A>). IfAis symmetric then
+d
+dx(x>Ax)) = (2Ax)>. A0.3 Primer on Constrained Optimization
+A0.3.1 Equality Constraints and Lagrange Multipliers
+Consider  rst the general optimization with equality constraints which gives
+rise to the notion of Lagrange multipliers .
+minxf(x) (0.1)
+subject to
+h(x) = 0
+wheref:Rn! Randh:Rn! Rkwhere his a vector function ( h1;:::;hk)
+each fromRntoR. We want to derive a necessary and sucient constraint
+for a point xoto be a local minimum subject to the kequality constraints
+h(x) = 0. Assume that xois a regular point, meaning that the gradient
+vectorsrhj(x) are linearly independent. Note that rh(xo) is aknmatrix
+and the null space of this matrix:
+null(rh(xo)) =fy:rh(xo)y= 0g
+de nes the tangent plane at the point xo. We have the following fundamental
+theorem:
+rf(xo)?null(rh(xo))
+in other words, all vectors yspanning the tangent plane at the point xoare
+also perpendicular to the gradient of fatxo. 100 Appendix
+The sketch of the proof is as follows. Let x(t),at<a , be a smooth
+curve on the surface h(x) = 0, i.e., h(x(t)) = 0. Let xo=x(0) and y=
+d
+dtx(0) the tangent to the curve at xo. From the de nition of tangency, the
+vector ylives innull(rh(xo)), i.e., yrhj(x(0)) = 0,j= 1;:::;k . Since
+xo=x(0) is a local extremum of f(x), then
+0 =d
+dtf(x(t))jt=0=X@f
+@xidxi
+dtjt=0=rf(xo)y:
+As a corollary of this basic theorem, the gradient vector rf(xo)2spanfrh1(xo);:::;rhk(xo)g,
+i.e.,
+rf(xo) +kX
+i=1irhi(xo) = 0;
+where the coecients iare called Lagrange Multipliers and the expression:
+f(x) +X
+iihi(x)
+is called the Lagrangian of the optimization problem (0.1). A0.3.2 Inequality Constraints and KKT conditions
+Consider next the general constrained optimization with inequality con-
+straints (called \non-linear programming"):
+minxf(x) (0.2)
+subject to
+h(x) = 0
+g(x)0
+where g:Rn! Rs. We will assume that the optimal solution xois a
+regular point which has the following meaning: Let Jbe the set of indices
+jsuch thatgj(xo) = 0, then xois a regular point if the gradient vectors
+rhi(xo);rgj(xo),i= 1;:::;k andj2Jare linearly independent. A basic
+result (we will not prove here) is the Karush-Kuhn-Tucker (KKT) theorem:
+Letxobe a local minimum of the problem and suppose xois a regular
+point. Then, there exist 1;:::;kand10;:::;s0such that: A0.3 Primer on Constrained Optimization 101
+),(* *zy),(zy
+yz
+!µ= +yz
+G
+nRx"
+))(),(( xfxg
+)(µ#
+Fig. A0.1. Geometric interpreatation of Duality (see text).
+rf(xo) +kX
+i=1irhi(xo) +sX
+j=1jrgj(xo) = 0; (0.3)
+sX
+j=1jgj(xo) = 0: (0.4)
+Note that the conditionPjgj(xo) = 0 is equivalent to the condition that
+jgj(xo) = 0 (since 0 and g(xo)0 thus there sum cannot vanish
+unless each term vanishes) which in turn implies: j= 0 whengj(xo)<0. The expression
+L(x;;) =f(x) +kX
+i=1ihi(x) +sX
+j=1jgj(x)
+is the Lagrangian of the problem (0.2) and the associated condition jgj(xo) =
+0 is called the KKT condition. The remaining concepts we need are the \duality" and the \Lagrangian
+Dual" problem. 102 Appendix
+A0.3.3 The Langrangian Dual Problem
+The optimization problem (0.2) is called the \Primal" problem. The La-
+grangian Dual problem is de ned as:
+max
+;(;) (0.5)
+subject to
+0 (0.6)
+where
+(;) = minxff(x) +X
+iihi(x) +X
+jjgj(x)g:
+Note that(;) may assume the value 1 for some values of ;(thus
+to be rigorous we should have replaced \min" with \inf"). The  rst basic
+result is the weak duality theorem:
+Letxbe a feasible solution to the primal (i.e., h(x) = 0;g(x)0) and let
+(;)be a feasible solution to the dual problem (i.e., 0), thenf(x)
+(;)
+The proof is immediate:
+(;) = minyff(y) +X
+iihi(y) +X
+jjgj(y)g
+f(x) +X
+iihi(x) +X
+jjgj(x)
+f(x)
+where the latter inequality follows from h(x) = 0 andP
+jjgj(x)0
+because0 and g(x)0. As a corollary of this theorem we have:
+minxff(x) :h(x) = 0;g(x)0gmax
+;f(;) :0g: (0.7)
+The next basic result is the strong duality theorem which speci es the con-
+ditions for when the inequality in (0.7) becomes equality:
+Letf();g()be convex functions and let h()be ane, i.e., h(x) =Axb
+whereAis aknmatrix, then
+minxff(x) :h(x) = 0;g(x)0g= max
+;f(;) :0g:
+The strong duality theorem allows one to solve for the primal problem by
+ rst dualizing it and solving for the dual problem instead (we will see exactly
+how to do it when we return to solving the primal problem (4.3)). When A0.3 Primer on Constrained Optimization 103
+),(* *zy
+yz
+G
+*µoptimal primal
+optimal dual
+Fig. A0.2. An example of duality gap arising from non-convexity (see text).
+the (convexity) conditions above do not hold we obtain
+minxff(x) :h(x) = 0;g(x)0g>max
+;f(;) :0g
+which means that the optimal solution to the dual problem provides only a
+lower bound to the primal problem | this situation is called a duality gap . Taken together, the "duality theorem" summarizes the discussion so far:
+Theorem 12 (Duality Theorem) In order for xto be an optimal Primal
+solution and (;)to be an optimal Dual solution, it is necessary and
+sucient that:
+(i)xis Primal feasible,
+(ii)0andj= 0for allgj(x)<0,
+(iii)x2argmin xL(x;;). We will end this section with a geometric interpretation of duality. A0.3.4 Geometric Interpretation of Duality
+For clarity we will consider a primal problem with a single inequality con-
+straint: minff(x) :g(x)0gwhereg:Rn! R. Consider the set G=f(y;z) :y=g(x);z=f(x)gin the (y;z) plane. The
+setGis the image of Rnunder the ( g;f) map (see Fig. A0.1). The primal 104 Appendix
+problem is to  nd a point in Gthat has ay0 with the smallest zvalue
+| this is the point ( y;z) in the  gure. In this case () = min xff(x) +g(x)gwhich is equivalent to minimize
+z+yover points in G. The equation z+y= represents a straight line
+with slopeand intercept (on zaxis) . For a given value , to minimize
+z+yoverGwe need to move the line z+y= parallel to itself as far
+down as possible while it remains in contact with G| in other words G
+is above the line and touches it. Then, the intercept with the zaxis gives
+(). The dual problem is therefore equivalent to  nding the slope of the
+supporting hyperplane such that its intercept on the zaxis is maximal . Consider the non-convex region Gin Fig. A0.2 which illustrates a duality
+gap condition. The optimal primal is the point ( y;z) which is higher than
+the greatest intercept on the zaxis achieved by a line that supports Gfrom
+below. This is an example of a duality gap caused by the non-convexity of
+the functions f();g() (thereby making the set Gnon-convex). Bibliography
+M. Anthony and P. L. Bartlett. Neural Neteowk Learning: Theoretical Foundations . Cambridge University Press, 1999. K. M. Hall. An r-dimensional quadratic placement algorithm. Manag. Sci. , 17:219{
+229, 1970. M. J. Kearns and U. V. Vazirani. An Introduction to Computational Learning The-
+ory. MIT Press, 1997. Y. Linde, A. Buzo, and R. M. Gray. An algorithm for vector quantizer design. IEEE
+Transactions on Communications , 1:84{95, 1980. A. Y. Ng, M. I. Jordan, and Y. Weiss. On spectral clustering: Analysis and an
+algorithm. In Proceedings of the conference on Neural Information Processing
+Systems (NIPS) , 2001. J. Shi and J. Malik. Normalized cuts and image segmentation. IEEE Transactions
+on Pattern Analysis and Machine Intelligence , 22(8), 2000. R. Zass and A. Shashua. A unifying approach to hard and probabilistic clustering. InProceedings of the International Conference on Computer Vision , Beijing,
+China, Oct. 2005.
+105

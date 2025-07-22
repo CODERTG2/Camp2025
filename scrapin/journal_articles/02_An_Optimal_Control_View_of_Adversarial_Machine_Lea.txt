@@ -1,0 +1,286 @@
+================================================================================
+JOURNAL ARTICLE #2
+================================================================================
+
+Title: An Optimal Control View of Adversarial Machine Learning
+Authors: Xiaojin Zhu
+Published: 2018-11-11
+Source: http://arxiv.org/pdf/1811.04422v1
+
+--------------------------------------------------------------------------------
+ABSTRACT/SUMMARY:
+--------------------------------------------------------------------------------
+I describe an optimal control view of adversarial machine learning, where the
+dynamical system is the machine learner, the input are adversarial actions, and
+the control costs are defined by the adversary's goals to do harm and be hard
+to detect. This view encompasses many types of adversarial machine learning,
+including test-item attacks, training-data poisoning, and adversarial reward
+shaping. The view encourages adversarial machine learning researcher to utilize
+advances in control theory and reinforcement learning.
+
+--------------------------------------------------------------------------------
+FULL TEXT CONTENT:
+--------------------------------------------------------------------------------
+arXiv:1811.04422v1 [cs. LG] 11 Nov 2018An Optimal Control View of Adversarial Machine Learning
+Xiaojin Zhu
+Department of Computer Sciences, University of Wisconsin-Madiso n
+Abstract
+I describe an optimal control view of adversarial machine le arning, where the dynamical system is the
+machine learner, the input are adversarial actions, and the control costs are deﬁned by the adversary’s
+goals to do harm and be hard to detect. This view encompasses m any types of adversarial machine
+learning, including test-item attacks, training-data poi soning, and adversarial reward shaping. The view
+encourages adversarial machinelearningresearcher touti lize advancesincontroltheoryandreinforcement
+learning.
+1 Adversarial Machine Learning is not Machine Learning
+Machine learning has its mathematical foundation in concentration in equalities. This is a consequence of
+the independent and identically-distributed (i.i.d.) data assumption. I n contrast, I suggest that adversarial
+machine learning may adopt optimal control as its mathematical fou ndation [3,25]. There are telltale signs:
+adversarial attacks tend to be subtle and have peculiar non-i.i.d. st ructures – as control input might be.
+2 Optimal Control
+I will focus on deterministic discrete-time optimal control because it matches many existing adversarial
+attacks. Extensions to stochastic and continuous control are r elevant to adversarial machine learning, too. The system to be controlled is called the plant, which is deﬁned by the s ystem dynamics:
+xt+1=f(xt,ut) (1)
+wherext∈Xtis the state of the system, ut∈Utis the control input, and Utis the control constraint
+set. The function fdeﬁnes the evolution of state under external control. The time ind extranges from 0
+toT−1, and the time horizon Tcan be ﬁnite or inﬁnite. The quality of control is speciﬁed by the runn ing
+cost:
+gt(xt,ut) (2)
+which deﬁnes the step-by-step control cost, and the terminal c ost for ﬁnite horizon:
+gT(xT) (3)
+which deﬁnes the quality of the ﬁnal state. The optimal control pr oblem is to ﬁnd control inputs u0...uT−1
+in order to minimize the objective:
+min
+u0...uT−1gT(xT)+T−1/summationdisplay
+t=0gt(xt,ut) (4)
+s.t.xt+1=f(xt,ut),ut∈Ut,∀t
+x0given
+1 More generally, the controller aims to ﬁnd control policies φt(xt) =ut, namely functions that map observed
+states to inputs. In optimal control the dynamics fis known to the controller. There are two styles of
+solutions: dynamic programming and Pontryagin minimum principle [2,10 ,17]. When fis not fully known,
+the problem becomes either robust control where control is carr ied out in a minimax fashion to accommodate
+the worst case dynamics [28], or reinforcement learning where the c ontroller probes the dynamics [23].
+3 Adversarial Machine Learning as Control
+Now let us translate adversarial machine learning into a control for mulation. Adversarial machine learning
+studies vulnerability throughout the learning pipeline [4,13,20,26]. As examples, I present training-data
+poisoning, test-time attacks, and adversarial reward shaping be low. In all cases, the adversary attempts to
+control the machine learning system, and the control costs reﬂe ct the adversary’s desire to do harm and be
+hard to detect. Unfortunately, the notations from the control community and th e machine learning community clash. For example, xdenotes the state in control but the feature vector in machine lea rning. I will use the machine
+learning convention below.
+3.1 Training-Data Poisoning
+In training-data poisoning the adversary can modify the training da ta. The machine learner then trains a
+“wrong” model from the poisoned data. The adversary’s goal is fo r the “wrong” model to be useful for some
+nefarious purpose. I use supervised learning for illustration.
+3.1.1 Batch Learner
+At this point, it becomes useful to distinguish batch learning and seq uential (online) learning. If the machine
+learner performs batch learning, then the adversary has a degen erateone-step control problem. One-step
+control has not been the focus of the control community and the re may not be ample algorithmic solutions to
+borrow from. Still, it is illustrative to pose batch training set poisoning as a control problem. I use Support
+Vector Machine (SVM) with a batch training set as an example below:
+•The state is the learner’s model h:X/mapsto→Y. For instance, for SVM his the classiﬁer parametrized by
+a weight vector w. I will use handwinterchangeably.
+•The control u0is a whole training set, for instance u0={(xi,yi)}1:n.
+•The control constraint set U0consists of training sets available to the adversary; if the adversa ry
+can arbitrary modify a training set for supervised learning (including changing features and labels,
+inserting and deleting items), this could be U0=∪∞
+n=0(X×Y)n, namely all training sets of all sizes. This is a large control space.
+•The system dynamics (1) is deﬁned by the learner’s learning algorithm . For the SVM learner, this
+would be empirical risk minimization with hinge loss ℓ() and a regularizer:
+w1=f(u0)∈argminwn/summationdisplay
+i=1ℓ(w,xi,yi)+λ/ba∇dblw/ba∇dbl2. (5)
+The batch SVM does not need an initial weight w0. The adversary has full knowledge of the dynamics
+f() if it knows the form (5), ℓ(), and the value of λ.
+•The time horizon T= 1.
+2 •The adversary’s running cost g0(u0) measures the poisoning eﬀort in preparing the training set u0. This is typically deﬁned with respect to a given “clean” data set ˜ubefore poisoning in the form of
+g0(u0) = distance( u0,˜u). (6)
+The running cost is domain dependent. For example, the distance fu nction may count the number of
+modiﬁed training items; or sum up the Euclidean distance of changes in feature vectors.
+•The adversary’s terminal cost g1(w1) measures the lack of intended harm. The terminal cost is also
+domain dependent. For example:
+–If the adversary must force the learner into exactly arriving at so me target model w∗, then
+g1(w1) =I∞[w1/ne}ationslash=w∗]. Here Iy[z] =yifzis true and 0 otherwise, which acts as a hard
+constraint.
+–If the adversary only needs the learner to get near w∗theng1(w1) =/ba∇dblw1−w∗/ba∇dblfor some norm.
+–If the adversarywants to ensure that a speciﬁc future item x∗is classiﬁed ǫ-conﬁdently aspositive,
+it can useg1(w1) =I∞[w1/∈W∗] with the target set W∗={w:w⊤x∗≥ǫ}. More generally,
+W∗can be a polytope deﬁned by multiple future classiﬁcation constraint s. With these deﬁnitions, the adversary’s one-step control problem (4) specializes to
+min
+u0g1(w1)+g0(w0,u0) (7)
+s.t.w1=f(w0,u0)
+Unsurprisingly, the adversary’s one-step control problem is equiv alent to a Stackelberg game and bi-level
+optimization (the lower level optimization is hidden in f), a well-known formulation for training-data poi-
+soning [12,21].
+3.1.2 Sequential Learner
+The adversary performs classic discrete-time control if the learn er is sequential:
+•The learner starts from an initial model w0, which is the initial state.
+•The control input at time tisut= (xt,yt), namely the tthtraining item for t= 0,1,...
+•The dynamics is the sequential update algorithm of the learner. For example, the learner may perform
+one step of gradient descent:
+wt+1=f(wt,ut) =wt−ηt∇ℓ(wt,xt,yt). (8)
+•The adversary’s running cost gt(wt,ut) typically measures the eﬀort of preparing ut. For example, it
+could measure the magnitude of change /ba∇dblut−˜ut/ba∇dblwith respect to a “clean” reference training sequence
+˜u. Or it could be the constant 1 which reﬂects the desire to have a sho rt control sequence.
+•The adversary’s terminal cost gT(wT) is the same as in the batch case. The problem (4) then produces the optimal training sequence poiso ning. Earlier attempts on sequential
+teaching can be found in [1,18,19].
+3 3.2 Test-Time Attack
+Test-time attack diﬀers from training-datapoisoning in that a mach ine learning model h:X/mapsto→Yis already-
+trained and given. Also given is a “test item” x. There are several variants of test-time attacks, I use the
+following one for illustration: The adversary seeks to minimally pertur bxintox′such that the machine
+learning model classiﬁes xandx′diﬀerently. That is,
+min
+x′distance( x,x′) (9)
+s.t.h(x)/ne}ationslash=h(y). The distance function is domain-dependent, though in practice the adversary often uses a mathematically
+convenient surrogate such as some p-norm/ba∇dblx−x′/ba∇dblp. One way to formulate test-time attack as optimal control is to tre at the test-item itself as the state, and
+the adversarial actions as control input. Let us ﬁrst look at the p opular example of test-time attack against
+image classiﬁcation:
+•Let the initial state x0=xbe the clean image.
+•The adversary’s control input u0is the vector of pixel value changes.
+•The control constraint set is U0={u:x0+u∈[0,1]d}to ensure that the modiﬁed image has valid
+pixel values (assumed to be normalized in [0 ,1]).
+•The dynamical system is trivially vector addition: x1=f(x0,u0) =x0+u0.
+•The adversary’s running cost is g0(x0,u0) = distance( x0,x1).
+•The adversary’s terminal cost is g1(x1) =I∞[h(x1) =h(x0)]. Note the machine learning model his
+only used to deﬁne the hard constraint terminal cost; hitself is not modiﬁed. With these deﬁnitions this is a one-step control problem (4) that is e quivalent to the test-time attack
+problem (9). This control view on test-time attack is more interesting when the a dversary’s actions are sequential
+U0,U1,..., and the system dynamics render the action sequence non-commu tative. The adversary’srunning
+costgtthen measures the eﬀort in performing the action at step t. One limitation of the optimal control
+view is that the action cost is assumed to be additive over the steps.
+3.3 Defense Against Test-Time Attack by Adversarial Traini ng
+Some defense strategies can be viewed as optimal control, too. On e defense against test-time attack is to
+require the learned model hto have the large-margin property with respect to a training set. L et (x,y)
+be any training item, and ǫa margin parameter. Then the large-margin property states that the decision
+boundary induced by hshould not pass ǫ-close to ( x,y):
+∀x′: (/ba∇dblx′−x/ba∇dblp≤ǫ)⇒h(x′) =y. (10)
+This is an uncountable number of constraints. It is relatively easy to enforce for linear learners such as
+SVMs, but impractical otherwise. Adversarial training can be viewed as a heuristic to approximate the uncountable constraint (10) with
+a ﬁnite number of active constraints: one performs test-time att ack against the current hfromxto ﬁnd
+an adversarial item x(1), such that /ba∇dblx(1)−x/ba∇dblp≤ǫbuth(x(1))/ne}ationslash=y. Instead of adding a single constraint
+h(x(1)) =y, an additional training item ( x(1),y) is then added to the training set. The machine learning
+algorithm learns a diﬀerent h, with the hope (but not constraining) that h(x(1)) =y. This process repeats
+forkiteration, resulting in kadditional training items ( x(i),y) fori= 1...k. It should be clear that such defense is similar to training-data poison ing, in that the defender uses data
+to modify the learned model. This is especially interesting when the lear ner performs sequential updates. One way to formulate adversarial training defense as control is th e following:
+4 •The state is the model ht. Initiallyh0can be the model trained on the original training data.
+•The control input ut= (xt,yt) is an additional training item with the trivial constraint set Ut=X×y.
+•The dynamics ht+1=f(ht,ut) is one-step update of the model, e.g. by back-propagation.
+•The defender’s running cost gt(ht,ut) can simply be 1 to reﬂect the desire for less eﬀort (the running
+cost sums up to k).
+•The defender’s terminal cost gT(hT) penalizes small margin of the ﬁnal model hTwith respect to the
+original training data. Of course, the resulting control problem (4) does not directly utiliz e adversarial examples. One way to
+incorporate them is to restrict Utto a set of adversarial examples found by invoking test-time attac kers on
+ht, similar to the heuristic in [7]. These adversarial examples do not even need to be successful attacks.
+3.4 Adversarial Reward Shaping
+When adversarialattacks are applied to sequential decision maker s such as multi-armed bandits or reinforce-
+mentlearningagents,atypicalattackgoalistoforcethelattert olearnawrongpolicyuseful tothe adversary. The adversary may do so by manipulating the rewards and the state s experienced by the learner [11,14]. To simplify the exposition, I focus on adversarial reward shaping ag ainst stochastic multi-armed bandit,
+becausethisdoesnotinvolvedeceptionthroughperceivedstates . Toreview, instochasticmulti-armedbandit
+the learner at iteration tchooses one of karms, denoted by It∈[k], to pull according to some strategy [6]. For example, the ( α,ψ)-Upper Conﬁdence Bound (UCB) strategy chooses the arm
+It∈argmaxi∈[k]ˆµi,Ti(t−1)+ψ∗−1/parenleftbiggαlogt
+Ti(t−1)/parenrightbigg
+(11)
+whereTi(t−1) is the number of times arm ihas been pulled up to time t−1, ˆµi,Ti(t−1)is the empirical
+mean of arm iso far, and ψ∗is the dual of a convex function ψ. The environment generates a stochastic
+rewardrIt∼νIt. The learner updates its estimate of the pulled arm:
+ˆµIt,TIt(t)=ˆµIt,TIt(t−1)TIt(t−1)+rIt
+TIt(t−1)+1(12)
+which in turn aﬀects which arm it will pull in the next iteration. The learn er’s goal is to minimize the
+pseudo-regret Tµmax−E/summationtextT
+t=1µItwhereµi=Eνiandµmax= max i∈[k]µi. Stochastic multi-armed bandit
+strategies oﬀer upper bounds on the pseudo-regret. With adversarial reward shaping, an adversary fully observes the bandit. The adversary intercepts the
+environmental reward rItin each iteration, and may choose to modify (“shape”) the reward in to
+rIt+ut
+with someut∈Rbefore sending the modiﬁed reward to the learner. The adversary ’s goal is to use minimal
+reward shaping to force the learner into performing speciﬁc wrong actions. For example, the adversary may
+want the learner to frequently pull a particular target arm i∗∈[k]. It should be noted that the adversary’s
+goal may not be the exact opposite of the learner’s goal: the targe t armi∗is not necessarily the one with
+the worst mean reward, and the adversary may not seek pseudo- regret maximization. Adversarial reward shaping can be formulated as stochastic optim al control:
+•The statest, now called control state to avoid confusion with the Markov Decisio n Process states
+experienced by an reinforcement learning agent, consists of the s uﬃcient statistic tuple at time t:
+st= (T1(t−1),ˆµ1,T1(t−1),...,T k(t−1),ˆµk,Tk(t−1),It).
+5 •The control input is ut∈UtwithUt=Rin the unconstrained shaping case, or the appropriate Utif
+the rewards must be binary, for example.
+•The dynamics st+1=f(st,ut) is straightforward via empirical mean update (12), TItincrement, and
+new arm choice (11).
+•The adversary’s running cost gt(st,ut) reﬂects shaping eﬀort and target arm achievement in iteration
+t. For instance,
+gt(st,ut) =u2
+t+Iλ[It/ne}ationslash=i∗]. (13)
+whereλ>0 is a trade oﬀ parameter.
+•There is not necessarily a time horizon Tor a terminal cost gT(sT). The control state is stochastic due to the stochastic reward rItentering through (12).
+4 Advantages of the Optimal Control View
+There are a number of potential beneﬁts in taking the optimal cont rol view:
+•It oﬀers a uniﬁed conceptual framework for adversarial machine learning;
+•The optimal control literature provides eﬃcient solutions when the dynamicsfis known and one can
+take the continuous limit to solve the diﬀerential equations [15];
+•Reinforcement learning, either model-based with coarse system ide ntiﬁcation or model-free policy it-
+eration, allows approximate optimal control when fis unknown, as long as the adversary can probe
+the dynamics [8,9];
+•A generic defense strategy may be to limit the controllability the adve rsary has over the learner.
+•I mention in passing that the optimal control view applies equally to ma chine teaching [27,29], and
+thus extends to the application of personalized education [22,24]. I need to point out some limitations:
+•Having a uniﬁed optimal control view does not automatically produce eﬃcient solutions to the control
+problem (4). For adversarial machine learning applications the dyna micsfis usually highly nonlinear
+and complex. Furthermore, in graybox and blackbox attack settin gsfis not fully known to the
+attacker. They aﬀect the complexity in ﬁnding an optimal control.
+•The adversarial learning setting is largely non-game theoretic, tho ugh there are exceptions [5,16]. These problems call for future research from both machine learnin g and control communities. Acknowledgments. I acknowledge funding NSF 1837132, 1545481, 1704117, 1623605 , 1561512, and
+the MADLab AF Center of Excellence FA9550-18-1-0166. References
+[1] Scott Alfeld, Xiaojin Zhu, and Paul Barford. Data poisoning atta cks against autoregressive models. In
+The Thirtieth AAAI Conference on Artiﬁcial Intelligence (A AAI-16), 2016.
+[2] Michael Athans and Peter L Falb. Optimal control: An introduction to the theory and its appli cations. Courier Corporation, 2013.
+[3] Dimitri P. Bertsekas. Dynamic Programming and Optimal Control . Athena Scientiﬁc, 4th edition, 2017.
+6 [4] Battista Biggio and Fabio Roli. Wild patterns: Ten years after the r ise of adversarial machine learning. CoRR, abs/1712.03141, 2017.
+[5] Michael Br¨ uckner and Tobias Scheﬀer. Stackelberg games for adversarial prediction problems. In Pro-
+ceedings of the 17th ACM SIGKDD international conference on Knowledge discovery and data mining ,
+pages 547–555. ACM, 2011.
+[6] S´ ebastienBubeck and Nicolo Cesa-Bianchi. Regret analysisof st ochastic and nonstochastic multi-armed
+bandit problems. Foundations and Trends in Machine Learning , 5(1):1–122, 2012.
+[7] Qi-Zhi Cai, Min Du, Chang Liu, and Dawn Song. Curriculum adversar ial training. In The 27th
+International Joint Conference on Artiﬁcial Intelligence (IJCAI), 2018.
+[8] Hanjun Dai, Hui Li, Tian Tian, Xin Huang, Lin Wang, Jun Zhu, and Le S ong. Adversarial attack on
+graphstructureddata. InJenniferDyandAndreasKrause,edit ors,Proceedings of the 35th International
+Conference on Machine Learning , volume 80 of Proceedings of Machine Learning Research , pages 1115–
+1124, Stockholmsmssan, Stockholm Sweden, 10–15 Jul 2018. PML R.
+[9] Yang Fan, Fei Tian, Tao Qin, and Tie-Yan Liu. Learning to teach. I nICLR, 2018.
+[10] Terry L Friesz. Dynamic optimization and diﬀerential games , volume 135. Springer Science & Business
+Media, 2010.
+[11] Sandy Huang, Nicolas Papernot, Ian Goodfellow, Yan Duan, and Pieter Abbeel. Adversarial attacks on
+neural network policies. arXiv, 2017.
+[12] Matthew Jagielski, Alina Oprea, Battista Biggio, Chang Liu, Cristin a Nita-Rotaru, and Bo Li. Ma-
+nipulating machine learning: Poisoning attacks and countermeasure s for regression learning. The 39th
+IEEE Symposium on Security and Privacy , 2018.
+[13] Anthony D. Joseph, Blaine Nelson, Benjamin I. P. Rubinstein, an d J. D. Tygar. Adversarial Machine
+Learning . Cambridge University Press, 2018. in press.
+[14] Kwang-Sung Jun, Lihong Li, Yuzhe Ma, and Xiaojin Zhu. Adversa rial attacks on stochastic bandits. InAdvances in Neural Information Processing Systems (NIPS) , 2018.
+[15] L. Lessard, X. Zhang, and X. Zhu. An Optimal Control Approa ch to Sequential Machine Teaching. ArXiv e-prints , October 2018.
+[16] Bo Li and Yevgeniy Vorobeychik. Scalable Optimization of Random ized Operational Decisions in Ad-
+versarialClassiﬁcationSettings. In Guy Lebanon and S. V. N. Vishw anathan, editors, Proceedings of the
+Eighteenth International Conference on Artiﬁcial Intelli gence and Statistics , volume 38 of Proceedings
+of Machine Learning Research , pages 599–607, San Diego, California, USA, 09–12 May 2015. PMLR .
+[17] Daniel Liberzon. Calculus of variations and optimal control theory: A concis e introduction . Princeton
+University Press, 2011.
+[18] Weiyang Liu, Bo Dai, Ahmad Humayun, Charlene Tay, Chen Yu, Lind a B Smith, James M Rehg,
+and Le Song. Iterative machine teaching. In International Conference on Machine Learning , pages
+2149–2158, 2017.
+[19] Weiyang Liu, Bo Dai, Xingguo Li, Zhen Liu, James M. Rehg, and Le So ng. Towards black-box iterative
+machine teaching. In ICML, volume 80 of JMLR Workshop and Conference Proceedings , pages 3147–
+3155. JMLR.org, 2018.
+[20] Daniel Lowd and Christopher Meek. Adversariallearning. In Proceedings of the eleventh ACM SIGKDD
+international conference on Knowledge discovery in data mi ning, pages 641–647. ACM, 2005.
+7 [21] Shike Mei and Xiaojin Zhu. Using machine teaching to identify optim al training-set attacks on machine
+learners. In The Twenty-Ninth AAAI Conference on Artiﬁcial Intelligenc e, 2015.
+[22] Kaustubh Patil, Xiaojin Zhu, Lukasz Kopec, and Bradley Love. O ptimal teaching for limited-capacity
+human learners. In Advances in Neural Information Processing Systems (NIPS) , 2014.
+[23] B. Recht. A Tour of Reinforcement Learning: The View from Con tinuous Control. ArXiv e-prints , June
+2018.
+[24] Ayon Sen, Purav Patel, Martina A. Rau, Blake Mason, Robert No wak, Timothy T. Rogers, and Xiaojin
+Zhu. Machine beats human at sequencing visuals for perceptual-ﬂu ency practice. In Educational Data
+Mining, 2018.
+[25] Emanuel Todorov. Optimal control theory. Bayesian brain: probabilistic approaches to neural coding ,
+pages 269–298, 2006.
+[26] Yevgeniy Vorobeychik and Murat Kantarcioglu. Adversarial ma chine learning. Synthesis Lectures on
+Artiﬁcial Intelligence and Machine Learning , 12(3):1–169, 2018.
+[27] XiaojinZhu. Machineteaching: aninverseproblemtomachinelear ningandanapproachtowardoptimal
+education. In The Twenty-Ninth AAAI Conference on Artiﬁcial Intelligenc e (AAAI “Blue Sky” Senior
+Member Presentation Track) , 2015.
+[28] Xiaojin Zhu, Ji Liu, and Manuel Lopes. No learner left behind: On the complexity of teaching multiple
+learners simultaneously. In The 26th International Joint Conference on Artiﬁcial Intel ligence (IJCAI) ,
+2017.
+[29] Xiaojin Zhu, Adish Singla, Sandra Zilles, and Anna N. Raﬀerty. An O verview of Machine Teaching. ArXiv e-prints , January 2018. https://arxiv.org/abs/1801.05927.
+8
